@@ -1,0 +1,16 @@
+{% extends "common/map-viewer-only.html" %}
+
+{% block tabs %}
+    <li><a href="#Monitoring"><span>Monitoring</span></a></li>
+{% endblock tabs %}
+
+{% block tabscontents %}
+    <div id="Monitoring">
+        <p>Here are a bunch of monitoring programs.</p>
+    </div>
+{% endblock tabscontents %}
+
+{% block layersConfig %}
+    // setup which kml files are shown in the data layers panel
+    lingcod.addLayer('{% url public-data-layers %}');
+{% endblock layersConfig %}
