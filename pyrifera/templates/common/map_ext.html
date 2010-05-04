@@ -1,16 +1,30 @@
 {% extends "common/map-viewer-only.html" %}
 
 {% block tabs %}
-    <li><a href="#Monitoring"><span>Monitoring</span></a></li>
+    <li><a href="#Monitoring"><span>Monitoring Data</span></a></li>
 {% endblock tabs %}
 
 {% block tabscontents %}
     <div id="Monitoring">
-        <p>Here are a bunch of monitoring programs.</p>
+        <p></p>
+        <div id="sites_tree"></div>
     </div>
 {% endblock tabscontents %}
 
 {% block layersConfig %}
     // setup which kml files are shown in the data layers panel
     lingcod.addLayer('{% url public-data-layers %}');
+    $(lingcod).bind('earthReady', function(e, ge, gex){
+        var sites_tree = kmltree({
+            url: '/sites/',
+            ge: ge, 
+            gex: gex, 
+            map_div: $('#map3d'), 
+            element: $('#sites_tree'),
+            bustCache: true,
+            setExtent: true,
+            restoreState: true
+        });
+        sites_tree.load();
+    });
 {% endblock layersConfig %}

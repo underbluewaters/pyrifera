@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
 from django.contrib import admin
+import monitoring
 
 admin.autodiscover()
 
@@ -25,6 +26,7 @@ urlpatterns = patterns('',
     # (r'^staticmap/', include('lingcod.staticmap.urls')),
     (r'^news/', include('lingcod.news.urls')),
     (r'^admin/', include(admin.site.urls)),
+    (r'^', include('monitoring.urls')),
 )
 
 # Useful for serving files when using the django dev server

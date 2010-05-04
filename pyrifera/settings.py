@@ -20,7 +20,7 @@ TEMPLATE_DIRS = ( os.path.realpath(os.path.join(os.path.dirname(__file__), 'temp
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '$_b-5e9rt!m!k^_)h4h-y54jqnumgfg$-vgk-@(=02f4-6#(u$'
 
-# INSTALLED_APPS += ( 'mlpa', )
+INSTALLED_APPS += ( 'monitoring', 'kfm', 'pisco_intertidal')
 # 
 # MPA_CLASS = 'mlpa.models.Mpa'
 # ARRAY_CLASS = 'mlpa.models.MpaArray'
