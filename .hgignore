@@ -1,3 +1,4 @@
 syntax: glob
 *.pyc
 settings_local.py
+*.orig
