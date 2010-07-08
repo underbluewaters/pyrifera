@@ -14,6 +14,8 @@ class Project(models.Model):
     
     def style_url(self):
         return "#default_site_stylemap"
+        
+    
 
 class SamplingSite(models.Model):
     name = models.CharField(max_length=100)

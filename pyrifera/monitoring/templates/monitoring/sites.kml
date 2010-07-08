@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" 
+    xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document>
+        {% for project in projects %}
+            {{project.styles}}
+        {% endfor %}
+        {% include "monitoring/default_site_style.kml" %}
+    	<name>Sampling Sites</name>
+        <Folder>
+            <name>Projects</name>
+            <open>1</open>
+            <visibilty>1</visibilty>
+            {% for project in projects %}
+                <Folder>
+                    <visibility>{% ifequal project.name "NPS Kelp Forest Monitoring" %}1{% else %}0{% endifequal %}</visibility>
+                    <name>{{project.name}}</name>
+                    {% for site in project.sites.all %}
+                        <Placemark>
+                            <name>{{site.name}}</name>
+                            <styleUrl>{{project.style_url}}</styleUrl>
+                            <description>{{site.code}}{{site.description}}</description>
+                            {{site.point.kml|safe}}
+                        </Placemark>
+                    {% endfor %}
+                </Folder>
+            {% endfor %}
+        </Folder>
+    </Document>
+</kml>

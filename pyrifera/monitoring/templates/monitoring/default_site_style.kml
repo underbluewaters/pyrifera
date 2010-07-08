@@ -1,0 +1,42 @@
+<Style id="small_default">
+	<IconStyle>
+		<scale>0.7</scale>
+		<Icon>
+			<href>http://chart.apis.google.com/chart?chst=d_map_pin_letter&amp;chld=|{% block color %}ffffff{% endblock color %}</href>
+		</Icon>
+		<hotSpot x="0.5"  y="0" 
+            xunits="fraction" yunits="fraction"/>
+	</IconStyle>
+	<LabelStyle>
+		<color>00ffffff</color>
+		<scale>0</scale>
+	</LabelStyle>
+	<ListStyle>
+	</ListStyle>
+</Style>
+<StyleMap id="default_site_stylemap">
+	<Pair>
+		<key>normal</key>
+		<styleUrl>#small_default</styleUrl>
+	</Pair>
+	<Pair>
+		<key>highlight</key>
+		<styleUrl>#large_default</styleUrl>
+	</Pair>
+</StyleMap>
+<Style id="large_default">
+	<IconStyle>
+		<scale>0.8</scale>
+		<Icon>
+			<href>http://chart.apis.google.com/chart?chst=d_map_pin_letter&amp;chld=|{% block colorTwo %}ffffff{% endblock colorTwo %}</href>
+		</Icon>
+		<hotSpot x="0.5"  y="0" 
+            xunits="fraction" yunits="fraction"/>
+	</IconStyle>
+	<LabelStyle>
+		<color>00ffffff</color>
+		<scale>0</scale>
+	</LabelStyle>
+	<ListStyle>
+	</ListStyle>
+</Style>
