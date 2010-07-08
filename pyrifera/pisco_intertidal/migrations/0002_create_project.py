@@ -9,7 +9,8 @@ class Migration(DataMigration):
     
     def forwards(self, orm):
         "Write your forwards methods here."
-        project = Project(name="PISCO Intertidal")
+        project = Project(name="PISCO Intertidal", 
+            app_label="pisco_intertidal")
         project.save()
     
     

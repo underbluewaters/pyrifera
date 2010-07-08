@@ -1,4 +1,4 @@
-<Style id="small_default">
+<Style id="{% if project %}{{project.app_label}}_{% endif %}small_default">
 	<IconStyle>
 		<scale>0.7</scale>
 		<Icon>
@@ -13,18 +13,27 @@
 	</LabelStyle>
 	<ListStyle>
 	</ListStyle>
+	<BalloonStyle>
+        {% block balloonStyle %}
+        <text><![CDATA[
+            <h3>$[name]</h3>
+            <p>$[code]</p>
+            <p>$[project]</p>
+        ]]></text>            
+        {% endblock balloonStyle %}
+    </BalloonStyle>
 </Style>
-<StyleMap id="default_site_stylemap">
+<StyleMap id="{% if project %}{{project.app_label}}{% else %}default{% endif %}_site_stylemap">
 	<Pair>
 		<key>normal</key>
-		<styleUrl>#small_default</styleUrl>
+		<styleUrl>#{% if project %}{{project.app_label}}_{% endif %}small_default</styleUrl>
 	</Pair>
 	<Pair>
 		<key>highlight</key>
-		<styleUrl>#large_default</styleUrl>
+		<styleUrl>#{% if project %}{{project.app_label}}_{% endif %}large_default</styleUrl>
 	</Pair>
 </StyleMap>
-<Style id="large_default">
+<Style id="{% if project %}{{project.app_label}}_{% endif %}large_default">
 	<IconStyle>
 		<scale>0.8</scale>
 		<Icon>

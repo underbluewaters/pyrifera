@@ -17,13 +17,11 @@
     $(lingcod).bind('earthReady', function(e, ge, gex){
         var sites_tree = kmltree({
             url: '/sites/',
-            ge: ge, 
             gex: gex, 
-            map_div: $('#map3d'), 
+            mapElement: $('#map3d'), 
             element: $('#sites_tree'),
             bustCache: true,
-            setExtent: true,
-            restoreState: true
+            setExtent: true
         });
         sites_tree.load();
     });

@@ -9,7 +9,7 @@ class Migration(DataMigration):
     
     def forwards(self, orm):
         "Write your forwards methods here."
-        kfm = Project(name="NPS Kelp Forest Monitoring")
+        kfm = Project(name="NPS Kelp Forest Monitoring", app_label="kfm")
         kfm.save()
     
     
