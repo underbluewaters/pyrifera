@@ -130,3 +130,46 @@ class Taxon(models.Model):
         # Must specify genus or common_name
         if self.common_name is '' and self.genus is '':
             raise ValidationError('Taxon must have a common_name or genus.')
+
+
+class Unit(models.Model):
+    u"""Describes the unit used in the sampling protocol, 
+    ie # per m\u00B2. 
+    """
+    name = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.name
+
+class Protocol(models.Model):
+    """Describes a sampling protocol used to collect DensityObservations 
+    and other types of data.
+    """
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    unit = models.ForeignKey(Unit)
+    url = models.URLField(blank=True)
+    code = models.CharField(max_length=20)
+    project = models.ForeignKey('Project')
+
+    def __unicode__(self):
+        return "%s - %s" % (self.project.name, self.name)
+
+    def sites(self):
+        return mean_densities.select_related('site').distinct()
+        
+
+class MeanDensity(models.Model):
+    """Observation of density or count at a particular site, date, taxon, and
+    protocol.
+    """
+    protocol = models.ForeignKey('Protocol', blank=False, 
+        related_name="mean_densities")
+    site = models.ForeignKey('SamplingSite', blank=False)
+    taxon = models.ForeignKey('Taxon', blank=False)
+    date = models.DateField(blank=False)
+    mean = models.FloatField(blank=False)
+    stddev = models.FloatField(blank=False)
+    n = models.IntegerField(blank=False)
