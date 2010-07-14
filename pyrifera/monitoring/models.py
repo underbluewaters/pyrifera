@@ -64,6 +64,7 @@ class SiteManager(models.GeoManager):
     
     def with_extras(self):
         return self.select_related('project')
+        
 
 class SamplingSite(models.Model):
     name = models.CharField(max_length=100)
@@ -87,3 +88,42 @@ class SamplingSite(models.Model):
             return "#%s_site_stylemap" % (self.project.app_label)
         else:
             return "#default_site_stylemap"
+            
+
+class Taxon(models.Model):
+    """Represents a particular species. 
+    Also represents concepts like blue rockfish recruit(<10cm) and 
+    blue rockfish. 
+    """
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    common_name = models.CharField(max_length=200, blank=True)
+    genus = models.CharField(max_length=200, blank=True)
+    species = models.CharField(max_length=200, blank=True)
+    scientific_name = models.CharField(max_length=200, blank=True)
+    code = models.CharField(max_length=100, blank=True)
+    # for when you need to mention "This species was added to our lists
+    # in 2003 because we decided to split Kelp Bass into Kelp Bass recruits 
+    # and adults"
+    notes = models.TextField(blank=True)
+    project = models.ForeignKey('Project')
+
+    def name(self):
+        """Formats an easy to read name, prefering a species binomial."""
+        if self.scientific_name:
+            return self.scientific_name
+        if self.genus and self.species:
+            return "%s %s" % (self.genus, self.species)
+        if self.common_name:
+            return self.common_name
+        if self.genus:
+            return "%s spp." % (self.genus, )
+
+    def __unicode__(self):
+        return self.name()
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        # Must specify genus or common_name
+        if self.common_name is '' and self.genus is '':
+            raise ValidationError('Taxon must have a common_name or genus.')
