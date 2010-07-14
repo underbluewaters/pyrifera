@@ -94,6 +94,9 @@ class Taxon(models.Model):
     """Represents a particular species. 
     Also represents concepts like blue rockfish recruit(<10cm) and 
     blue rockfish. 
+    It's difficult to require specific names like genus and species for this
+    model since often this information isn't a part of the datasets that are
+    being imported. It's easier to just treat these more like tags for data
     """
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
