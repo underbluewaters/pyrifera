@@ -1,12 +1,14 @@
-from django.contrib.gis.db import models
 import os
+
+from django.contrib.gis.db import models
 from django.template.loader import render_to_string
 from django.template import Context, Template
+
 from monitoring import memoized
 
 SITE_STYLE = 'monitoring/site_style.kml'
 
-# Create your models here.
+
 class Project(models.Model):
     """A research project."""
     name = models.CharField(max_length=100, unique=True)
@@ -43,8 +45,8 @@ class Project(models.Model):
     @memoized
     def has_style(self, template_name):
         if self.module:
-            path = os.path.join(
-                self.module.__path__[0], 'templates', template_name)
+            path = os.path.join(self.module.__path__[0], 
+                'templates', template_name)
             if os.path.exists(path):
                 return path
         return False
@@ -53,6 +55,7 @@ class Project(models.Model):
     @memoized
     def module(self):
         """Returns the module of the app specified in the app_label property.
+        
         """
         if self.app_label:
             return __import__(self.app_label)
@@ -88,7 +91,32 @@ class SamplingSite(models.Model):
             return "#%s_site_stylemap" % (self.project.app_label)
         else:
             return "#default_site_stylemap"
-            
+
+    def years_sampled(self):
+        """Returns all years that the site has been sampled."""
+        return self.mean_densities.order_by('year').values_list(
+            'year', flat=True).distinct('year')
+
+    @property
+    def taxa(self):
+        """Returns all taxa that have a density value at this site."""
+        ids = self.mean_densities.values_list('taxon').distinct()
+        return Taxon.objects.filter(pk__in=ids)
+
+    @property
+    def observed_taxa(self):
+        """Returns all taxa that have been observed at this site 
+        (counts of zero not included).
+        """
+        ids = self.mean_densities.filter(mean__gt=0).values_list('taxon')
+        return Taxon.objects.filter(pk__in=ids.distinct())
+    
+    @property
+    def protocols(self):
+        """Returns all protocols that have been used at the site."""
+        return Protocol.objects.filter(
+            pk__in=self.mean_densities.values_list('protocol').distinct())
+
 
 class Taxon(models.Model):
     """Represents a particular species. 
@@ -97,6 +125,7 @@ class Taxon(models.Model):
     It's difficult to require specific names like genus and species for this
     model since often this information isn't a part of the datasets that are
     being imported. It's easier to just treat these more like tags for data
+    
     """
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -111,6 +140,9 @@ class Taxon(models.Model):
     notes = models.TextField(blank=True)
     project = models.ForeignKey('Project')
 
+    def __unicode__(self):
+        return self.name()
+        
     def name(self):
         """Formats an easy to read name, prefering a species binomial."""
         if self.scientific_name:
@@ -121,29 +153,31 @@ class Taxon(models.Model):
             return self.common_name
         if self.genus:
             return "%s spp." % (self.genus, )
-
-    def __unicode__(self):
-        return self.name()
     
     def clean(self):
         from django.core.exceptions import ValidationError
         # Must specify genus or common_name
-        if self.common_name is '' and self.genus is '':
-            raise ValidationError('Taxon must have a common_name or genus.')
+        if self.common_name is '' and self.genus is '' and \
+            self.scientific_name is '':
+            raise ValidationError('Taxon %s must have a common_name, '+
+                'genus or scientific_name.' % (self.code))
 
 
 class Unit(models.Model):
     u"""Describes the unit used in the sampling protocol, 
-    ie # per m\u00B2. 
+    for example: "# per m\u00B2". 
+    
     """
     name = models.CharField(max_length=10)
 
     def __unicode__(self):
         return self.name
 
+
 class Protocol(models.Model):
     """Describes a sampling protocol used to collect DensityObservations 
     and other types of data.
+    
     """
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -159,19 +193,33 @@ class Protocol(models.Model):
 
     def sites(self):
         return mean_densities.select_related('site').distinct()
-        
+    
+    @property
+    def taxa(self):
+        """Returns all taxa observed with this protocol."""
+        return Taxon.objects.filter(
+            pk__in=self.mean_densities.filter(
+                protocol=self).values_list('taxon').distinct())
+
 
 class MeanDensity(models.Model):
     """Observation of density or count at a particular site, date, taxon, and
     protocol.
+    
     """
     protocol = models.ForeignKey('Protocol', blank=False, 
         related_name="mean_densities")
-    site = models.ForeignKey('SamplingSite', blank=False)
-    taxon = models.ForeignKey('Taxon', blank=False)
+    site = models.ForeignKey('SamplingSite', blank=False, 
+        related_name="mean_densities")
+    taxon = models.ForeignKey('Taxon', blank=False,
+        related_name="mean_densities")
     year = models.IntegerField(blank=False)
-    month = models.IntegerField(blank=True)
-    day = models.IntegerField(blank=True)
+    month = models.IntegerField(blank=True, null=True)
+    day = models.IntegerField(blank=True, null=True)
     mean = models.FloatField(blank=False)
     stderror = models.FloatField(blank=False)
-    n = models.IntegerField(blank=True)
+    n = models.IntegerField(blank=True, null=True)
+    
+    def __unicode__(self):
+        return "%d %s %s %s: %d %s" % (self.year, self.site.name, 
+        self.protocol.name, self.taxon, self.mean, self.protocol.unit)

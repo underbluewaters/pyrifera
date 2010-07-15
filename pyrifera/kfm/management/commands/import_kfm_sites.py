@@ -3,12 +3,15 @@ from optparse import make_option
 from monitoring.models import SamplingSite, Project
 import csv
 from django.contrib.gis.geos import Point, fromstr
+from django.db import transaction
+
 
 class Command(BaseCommand):
     option_list = AppCommand.option_list
     help = "Loads kfm sites from a csv file. Requires a path to a csv files."
     args = '[path]'
     
+    @transaction.commit_on_success
     def handle(self, path, *args, **options):
         """Assumes a csv file with headers, comma delimiters, and quoted 
         values. Values accessed by keys SiteName, SiteCode, Latitude, 
