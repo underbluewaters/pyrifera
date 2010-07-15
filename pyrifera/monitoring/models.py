@@ -172,4 +172,4 @@ class MeanDensity(models.Model):
     date = models.DateField(blank=False)
     mean = models.FloatField(blank=False)
     stddev = models.FloatField(blank=False)
-    n = models.IntegerField(blank=False)
+    n = models.IntegerField(blank=True)
