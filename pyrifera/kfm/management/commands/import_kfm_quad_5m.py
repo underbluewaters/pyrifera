@@ -7,7 +7,8 @@ from monitoring.data_import import import_data
 
 class Command(BaseCommand):
     option_list = AppCommand.option_list
-    help = "Loads kfm rpc data from a csv file. Requires a path to the file."
+    help = "Loads kfm 5 meter quad data from a csv file. Requires a path to \
+        the file."
     args = '[path]'
     
     def handle(self, path, *args, **options):
@@ -18,7 +19,7 @@ class Command(BaseCommand):
         This command _will_ overwrite existing observations.
         """
         kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
-        saved = import_data(path, kfm, 'Random Point Contact', "% cover", 
+        saved = import_data(path, kfm, 'Quadrat: 5 Meter', u"# per m\u00B2", 
             site='SiteCode', 
             taxon='Species', 
             year='Year', 

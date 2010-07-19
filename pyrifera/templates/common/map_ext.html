@@ -6,7 +6,7 @@
 
 {% block tabscontents %}
     <div id="Monitoring">
-        <p></p>
+        <p><input style="float:left;margin-right:1em;width:50%;padding-top:6px;" type="text" name="search" value="species name" id="search"><a id="speciessearch" href="#" class="button"><span>Search</span></a></p><br style="clear:both;" />
         <div id="sites_tree"></div>
     </div>
 {% endblock tabscontents %}
@@ -16,12 +16,12 @@
     lingcod.addLayer('{% url public-data-layers %}');
     $(lingcod).bind('earthReady', function(e, ge, gex){
         var sites_tree = kmltree({
-            url: '/sites/',
+            url: '/projects/',
             gex: gex, 
             mapElement: $('#map3d'), 
             element: $('#sites_tree'),
             bustCache: true,
-            setExtent: true
+            setExtent: false
         });
         sites_tree.load();
     });

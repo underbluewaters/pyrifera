@@ -16,9 +16,7 @@
 	<BalloonStyle>
         {% block balloonStyle %}
         <text><![CDATA[
-            <h3>$[name]</h3>
-            <p>$[code]</p>
-            <p>$[project]</p>
+            $[description]
         ]]></text>            
         {% endblock balloonStyle %}
     </BalloonStyle>

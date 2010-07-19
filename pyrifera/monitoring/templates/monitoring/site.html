@@ -1,0 +1,25 @@
+{% extends 'common/panel.html' %}
+{% block title %}{{site.name}}{% endblock title %}
+{% block panel %}
+    <h1>{{site.name}}</h1>
+    <div class="tabs">
+        <ul>
+            <li><a href="#SiteInfo"><span>Site Info</span></a></li>
+            <li><a href="{% url monitoring.views.species_lists site.pk %}"><span>Species Lists</span></a></li>
+            <li><a href="#Streamgraphs"><span>Streamgraphs</span></a></li>
+            <li><a href="#SizeFrequency"><span>SizeFrequency</span></a></li>
+        </ul>
+        <div id="SiteInfo">
+            <p>....</p>
+        </div>
+        <div id="Streamgraphs">
+            {% for protocol in site.protocols.all %}
+                <h4><a href="#">{{protocol.name}}</a></h4>
+                <img src="{{MEDIA_URL}}mockups/streamgraph_1.png" />
+            {% endfor %}
+        </div>
+        <div id="SizeFrequency">
+            <p>....</p>
+        </div>
+    </div>
+{% endblock panel %}

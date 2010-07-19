@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" 
+    xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document>
+        {% for project in projects %}
+            {{project.styles|safe}}
+        {% endfor %}
+        {% include "monitoring/default_site_style.kml" %}
+    	<name></name>
+        <Folder>
+            <name>Projects</name>
+        	<Snippet>Click on sampling sites on the map or expand a project folder to view data. To learn more about a project or protocol, click on the name.</Snippet>
+            <open>1</open>
+            <visibilty>1</visibilty>
+            {% for project in projects %}
+                <Folder>
+                    <visibility>{% ifequal project.name "NPS Kelp Forest Monitoring" %}1{% else %}0{% endifequal %}</visibility>
+                    <name>{{project.name}}</name>
+                    {#  radio foldder with a "Sampling Sites" networklink and a Folder o#}
+                    <Folder>
+                        <name>Sampling Sites</name>
+                        <visibility>1</visibility>
+                        <open>0</open>                        
+                        {% for site in project.sites.with_extras %}
+                            <Placemark>
+                                <name>{{site.name}}</name>
+                                <styleUrl>{{site.style_url}}</styleUrl>
+                                <description><![CDATA[
+                                    <h3>{{site.name}}</h3>
+                                    <p class="project">A {{site.project.name}} Site</p>
+                                    <p class="dates">1985-2009</p>
+                                    <h4>sampled here</h4>
+                                    <ul>
+                                        {% for protocol in site.protocols.all %}
+                                            <li>{{protocol.name}}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <p class="videos">4 videos</p>
+                                    <a href="{% url monitoring.views.site site.pk %}" rel="sidebar">More Information</a>
+                                    ]]>
+                                </description>
+                                {{site.point.kml|safe}}
+                                <ExtendedData>
+                                    <Data name="code">
+                                        <value>{{site.code}}</value>
+                                    </Data>
+                                    <Data name="project">
+                                        <value>{{site.project.name}}</value>
+                                    </Data>
+                                </ExtendedData>
+                            </Placemark>
+                        {% endfor %}
+                    </Folder>
+                    <Folder>
+                        <name>Species Data</name>
+                        <visibility>0</visibility>
+                        <open>1</open>
+                        <Folder>
+                            <name>All Protocols</name>
+                            <open>0</open>
+                            <visibility>0</visibility>
+                            {% for taxon in project.taxa %}
+                                <Folder>
+                                    <name>{{taxon.name}}</name>
+                                    <open>0</open>
+                                    <visibility>0</visibility>
+                                </Folder>
+                            {% endfor %}
+                        </Folder>
+                        {% for protocol in project.protocol_set.all %}
+                            <Folder>
+                                <name>{{protocol.name}}</name>
+                                <open>0</open>
+                                <visibility>0</visibility>
+                            </Folder>
+                        {% endfor %}
+                        <NetworkLink>
+                            <name>Example proportional symbol display</name>
+                            <visibility>0</visibility>
+                            <open>0</open>
+                            <refreshVisibility>0</refreshVisibility>
+                            <flyToView>0</flyToView>
+                            <Link>
+                                <href>http://sites.google.com/site/thematicmapping2/population_2005_collada_sphere.kmz</href>
+                            </Link>
+                        </NetworkLink>
+                    </Folder>
+                </Folder>
+            {% endfor %}
+        </Folder>
+    </Document>
+</kml>

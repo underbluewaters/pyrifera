@@ -62,6 +62,8 @@ class Project(models.Model):
         else:
             return False
     
+    def taxa(self):
+        return self.taxon_set.all().order_by('scientific_name')
 
 class SiteManager(models.GeoManager):
     
@@ -115,7 +117,8 @@ class SamplingSite(models.Model):
     def protocols(self):
         """Returns all protocols that have been used at the site."""
         return Protocol.objects.filter(
-            pk__in=self.mean_densities.values_list('protocol').distinct())
+            pk__in=self.mean_densities.values_list('protocol').distinct()
+                ).order_by('name')
 
 
 class Taxon(models.Model):
