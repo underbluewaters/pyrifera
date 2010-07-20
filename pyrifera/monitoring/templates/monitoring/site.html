@@ -10,7 +10,19 @@
             <li><a href="#SizeFrequency"><span>SizeFrequency</span></a></li>
         </ul>
         <div id="SiteInfo">
-            <p>....</p>
+            <p class="project">A {{site.project.name}} Site</p>
+            <p class="dates"><a href="http://intertidalweb.org/subtidal/subtidal/pages/timeline.php#SCI_PELICAN">1985-2009 <- graphic display here</a></p>
+            <h4>sampled here</h4>
+            <ul>
+                {% for protocol in site.protocols.all %}
+                    <li>{{protocol.name}}</li>
+                {% endfor %}
+            </ul>
+            <p class="videos">
+                <video controls preload width="320" height="240">
+                     <source src="http://mm-01.msi.ucsb.edu/~cburt/kfm_video/SMWL_2009.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                </video>
+            </p>
         </div>
         <div id="Streamgraphs">
             {% for protocol in site.protocols.all %}

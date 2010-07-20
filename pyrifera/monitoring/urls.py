@@ -5,4 +5,6 @@ urlpatterns = patterns('',
     (r'^projects/', 'monitoring.views.projects'),
     (r'^species_lists/(\d+)/', 'monitoring.views.species_lists'),
     (r'^streamgraphs/(\d+)/(\d+)/', 'monitoring.views.streamgraph'),
+    (r'^proportional_symbols/(\d+)/', 'monitoring.views.proportional_symbols'),
+    (r'^site_data/(\d+)/(\d+)/', 'monitoring.views.species_site_data'),
 )

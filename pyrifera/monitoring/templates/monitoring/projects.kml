@@ -60,11 +60,15 @@
                             <open>0</open>
                             <visibility>0</visibility>
                             {% for taxon in project.taxa %}
-                                <Folder>
+                                <NetworkLink>
                                     <name>{{taxon.name}}</name>
                                     <open>0</open>
                                     <visibility>0</visibility>
-                                </Folder>
+                                    <flyToView>0</flyToView>
+                                    <Link>
+                                        <href>{% url monitoring.views.proportional_symbols taxon.pk %}</href>
+                                    </Link>
+                                </NetworkLink>
                             {% endfor %}
                         </Folder>
                         {% for protocol in project.protocol_set.all %}

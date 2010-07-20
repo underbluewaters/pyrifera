@@ -44,4 +44,25 @@ def species_lists(request, pk):
             'site': site, 
             'protocols': site.protocols.all()
         }, context_instance=RequestContext(request))
+
+def proportional_symbols(request, pk):
+    taxon = get_object_or_404(Taxon, pk=pk)
+    observations = MeanDensity.objects.filter(taxon=taxon).order_by(
+        'year').select_related('site')
+    return render_to_response('monitoring/proportional_symbols.kml', {
+            "taxon": taxon,
+            "observations": observations
+        }, mimetype="application/vnd.google-earth.kml+xml", 
+        context_instance=RequestContext(request))
+
+def species_site_data(request, taxon_pk, site_pk):
+    taxon = get_object_or_404(Taxon, pk=taxon_pk)
+    site = get_object_or_404(SamplingSite, pk=site_pk)
+    observations = MeanDensity.objects.filter(taxon=taxon).order_by(
+        'year').select_related('site')
+    return render_to_response('monitoring/species_site_data.html', {
+            "taxon": taxon,
+            "site": site,
+            "observations": observations
+        }, context_instance=RequestContext(request))
     

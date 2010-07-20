@@ -1,0 +1,20 @@
+{% extends 'common/panel.html' %}
+{% block title %}{{site.name}} Species Lists{% endblock title %}
+{% block panel %}
+    <h1>{{Taxon.name}}</h1>
+    <div class="tabs">
+        <ul>
+            <li><a href="#site_{{site.pk}}">{{site.name}}</a></li>
+            <li><a href="#allsites">All Sites</a></li>
+        </ul>
+        <div id="site_{{site.pk}}">
+            <h4>Images From Flickr</h4>
+            <img src="http://farm3.static.flickr.com/2549/4046786229_8ce73db041_t.jpg"><img src="http://farm3.static.flickr.com/2441/3868729924_02ed2be7eb_t.jpg"><img src="http://farm5.static.flickr.com/4059/4716007223_4799c6a05d_t.jpg">
+            <h4>Data</h4>
+            <img src="http://intertidalweb.org/subtidal/subtidal/rpc/MultiAbundanceGraph.rpc.php?fish-EJAC=Embiotoca%20jacksoni&error_bars=0&site_code=SCI_PELICAN&scale=2" />
+        </div>
+        <div id="allsites">
+            histogram of data for all sites, North -> South, West->East
+        </div>
+    </div>
+{% endblock panel %}
