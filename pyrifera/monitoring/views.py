@@ -15,17 +15,18 @@ def streamgraph(request, site_pk, protocol_pk):
     """Renders a kml file representing sites."""
     site = get_object_or_404(SamplingSite, pk=site_pk)
     protocol = get_object_or_404(Protocol, pk=protocol_pk)
+    data = records_to_json(site.mean_densities.filter(protocol=protocol))
     project = protocol.project
-    data = []
-    for taxon in site.taxa:
-        a = []
-        for val in site.mean_densities.filter(taxon=taxon, protocol=protocol).order_by('year', 'taxon').values_list('mean', flat=True):
-            a.append(round(val, 4))
-        if len(a) > 0:
-            data.append(a)
-    
-    data = json.dumps(data)
-    print data
+    # data = []
+    # for taxon in site.taxa:
+    #     a = []
+    #     for val in site.mean_densities.filter(taxon=taxon, protocol=protocol).order_by('year', 'taxon').values_list('mean', flat=True):
+    #         a.append(round(val, 4))
+    #     if len(a) > 0:
+    #         data.append(a)
+    # 
+    # data = json.dumps(data)
+    # print data
     return render_to_response('monitoring/streamgraph.html', {
         'site': site,
         'project': project,
@@ -35,7 +36,14 @@ def streamgraph(request, site_pk, protocol_pk):
 
 def site(request, pk):
     site = get_object_or_404(SamplingSite, pk=pk)
-    return render_to_response('monitoring/site.html', {'site': site}, 
+    # streamgraph_data = "{"
+    # for protocol in site.protocols.all():
+    #     streamgraph_data = streamgraph_data + ("'%s': %s" % (protocol.name, records_to_json(site.mean_densities.filter(protocol=protocol))))
+    # streamgraph_data = streamgraph_data + "}"
+    return render_to_response('monitoring/site.html', {
+        'site': site,
+        # 'streamgraph_data': streamgraph_data,
+        }, 
         context_instance=RequestContext(request))
     
 def species_lists(request, pk):
@@ -65,4 +73,3 @@ def species_site_data(request, taxon_pk, site_pk):
             "site": site,
             "observations": observations
         }, context_instance=RequestContext(request))
-    

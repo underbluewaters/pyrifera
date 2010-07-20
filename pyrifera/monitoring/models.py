@@ -3,6 +3,7 @@ import os
 from django.contrib.gis.db import models
 from django.template.loader import render_to_string
 from django.template import Context, Template
+from django.utils import simplejson
 
 from monitoring import memoized
 
@@ -202,8 +203,7 @@ class Protocol(models.Model):
         """Returns all taxa observed with this protocol."""
         return Taxon.objects.filter(
             pk__in=self.mean_densities.filter(
-                protocol=self).values_list('taxon').distinct())
-
+                protocol=self).values_list('taxon').distinct())                
 
 class MeanDensity(models.Model):
     """Observation of density or count at a particular site, date, taxon, and
@@ -226,3 +226,43 @@ class MeanDensity(models.Model):
     def __unicode__(self):
         return "%d %s %s %s: %d %s" % (self.year, self.site.name, 
         self.protocol.name, self.taxon, self.mean, self.protocol.unit)
+
+def records_to_json(queryset):
+    results = []
+    min_year = 100000
+    max_year = 0
+    min_mean = 0
+    max_mean = 0
+    for record in queryset.select_related('taxon', 'site', 'protocol', 
+        'protocol__unit', 'protocol__project').order_by('taxon', 'year'):
+        results.append({
+            'taxon': record.taxon.pk,
+            'scientific_name': record.taxon.scientific_name,
+            'common_name': record.taxon.common_name,
+            'mean': record.mean,
+            'stderror': record.stderror,
+            'year': record.year,
+            'month': record.month,
+            'day': record.day,
+            'n': record.n,
+            'protocol': record.protocol.name,
+            'site': record.site.name,
+            'project': record.protocol.project.name,
+        })
+        
+        if record.year < min_year:
+            min_year = record.year
+        if record.year > max_year:
+            max_year = record.year
+        if record.mean < min_mean:
+            min_mean = record.mean
+        if record.mean > max_mean:
+            max_mean = record.mean
+    
+    return simplejson.dumps({
+        'min_year': min_year,
+        'max_year': max_year,
+        'min_mean': min_mean,
+        'max_mean': max_mean,
+        'records': results,
+    })

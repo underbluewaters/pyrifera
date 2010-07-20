@@ -1,5 +1,8 @@
 {% extends "common/map-viewer-only.html" %}
-
+{% block headtwo %}
+    <script type="text/javascript" src="{{MEDIA_URL}}protovis-3.2/protovis-r3.2.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}stream.js"></script>
+{% endblock headtwo %}
 {% block tabs %}
     <li><a href="#Monitoring"><span>Monitoring Data</span></a></li>
 {% endblock tabs %}

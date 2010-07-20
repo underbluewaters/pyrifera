@@ -10,37 +10,99 @@ body {
 }
 
     </style>
-  </head>
-  <body>
-  <script type="text/javascript" charset="utf-8">
-      var data = {{data}};
-  </script>
-  <script type="text/javascript+protovis">
+    </head>
+    <body>
+    <script type="text/javascript" charset="utf-8">
+        var data = {{data|safe}};
+    </script>
+    <script type="text/javascript+protovis">
+        var w = 1024,
+        h = 768,
+        x = pv.Scale.linear(data['min_year'], data['max_year']).range(0, w),
+        y = pv.Scale.linear(0, data['max_mean'] * 4.5).range(0, h),
+        // c = pv.Scale.linear(data).range("#1f77b4", "#ff7f0e");
+        var vis = new pv.Panel()
+            .width(w)
+            .height(h)
+            .def('i', -1)
 
-var n = 10, // number of layers
-    m = 23;//, // number of samples per layer
-    // data = layers(n, m);
+        var grouped_by_taxon = pv.values(pv.nest(data.records).key(function(d){return d.taxon}).map())
+        var max_length = 0;
+        for(var i=0; i<grouped_by_taxon.length;i++){
+            if(grouped_by_taxon[i].length > max_length){
+                max_length = grouped_by_taxon[i].length;
+            }
+        }
+        var records = [];
+        for(var i=0; i<grouped_by_taxon.length;i++){
+            if(grouped_by_taxon[i].length === max_length){
+                records.push(grouped_by_taxon[i]);
+            }            
+        }
+        vis.add(pv.Layout.Stack)
+            .layers(records)
+            .order("inside-out")
+            // .offset("zero")
+            .offset("wiggle")
+            // .offset("expand")
+            // .offset("silohouette")
+            .x(function(d) x(d.year))
+            .y(function(d) y(d.mean))
+          .layer.add(pv.Area)
+            // .visible(function(d) d.length > 9)
+            .event("mouseover", function(d) vis.i(d.taxon))
+            .event("mouseout", function() vis.i(-1))
+            .fillStyle(pv.Colors.category20().by(function(d) d.taxon))
+            .strokeStyle(function() this.fillStyle().alpha(.5))
+            .title(function(d) d.scientific_name)
+            .anchor("center").add(pv.Label)
+                .def("max", function(d) pv.max.index(d, function(d) d.mean))
+                .visible(function() this.index == this.max())
+                // .visible(function(d) vis.i() === d.taxon)
+                .textStyle("black")
+                .textMargin(6)
+                .textAlign(function() this.index < 5 ? "left" : "right")
+                .font(function(d) Math.round(5 + Math.sqrt(y(d.mean))) + "px sans-serif")
+                .text(function(d) d.scientific_name);
+        
+        /* X-axis and ticks. */
+        vis.add(pv.Rule)
+            .data(x.ticks())
+            .visible(function(d) d)
+            .left(x)
+            .bottom(10)
+            .height(5)
+          .anchor("bottom").add(pv.Label)
+            // .text(x.tickFormat);
 
-var w = document.body.clientWidth,
-    h = document.body.clientHeight,
-    x = pv.Scale.linear(0, m - 1).range(0, w),
-    y = pv.Scale.linear(0, 2 * n).range(0, h);
+        vis.root.render();
 
-var vis = new pv.Panel()
-    .width(w)
-    .height(h);
 
-vis.add(pv.Layout.Stack)
-    .layers(data)
-    .order("inside-out")
-    .offset("wiggle")
-    .x(x.by(pv.index))
-    .y(function(y){ if(y===undefined){return 0}else{return y}})
-  .layer.add(pv.Area)
-    .fillStyle(pv.ramp("#aad", "#556").by(Math.random))
-    .strokeStyle(function() this.fillStyle().alpha(.5));
-
-vis.render();
+// 
+// var n = 10, // number of layers
+//     m = 23;//, // number of samples per layer
+//     // data = layers(n, m);
+// 
+// var w = document.body.clientWidth,
+//     h = document.body.clientHeight,
+//     x = pv.Scale.linear(0, m - 1).range(0, w),
+//     y = pv.Scale.linear(0, 2 * n).range(0, h);
+// 
+// var vis = new pv.Panel()
+//     .width(w)
+//     .height(h);
+// 
+// vis.add(pv.Layout.Stack)
+//     .layers(data)
+//     .order("inside-out")
+//     .offset("wiggle")
+//     .x(x.by(pv.index))
+//     .y(function(y){ if(y===undefined){return 0}else{return y}})
+//   .layer.add(pv.Area)
+//     .fillStyle(pv.ramp("#aad", "#556").by(Math.random))
+//     .strokeStyle(function() this.fillStyle().alpha(.5));
+// 
+// vis.render();
 
     </script>
   </body>
