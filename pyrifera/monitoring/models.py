@@ -266,3 +266,10 @@ def records_to_json(queryset):
         'max_mean': max_mean,
         'records': results,
     })
+    
+class Video(models.Model):
+    """Represents a video of a particular site on a given year.
+    """
+    site = models.ForeignKey('SamplingSite', blank=False, related_name='videos')
+    year = models.IntegerField(blank=False)
+    url = models.URLField(blank=False, verify_exists=True)

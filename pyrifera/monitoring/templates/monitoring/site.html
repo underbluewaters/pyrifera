@@ -18,11 +18,13 @@
                     <li>{{protocol.name}}</li>
                 {% endfor %}
             </ul>
-            <p class="videos">
+            <ul class="videos">
+                {% for video in site.videos.all %}
                 <video controls preload width="320" height="240">
-                     <source src="http://mm-01.msi.ucsb.edu/~cburt/kfm_video/SMWL_2009.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-                </video>
-            </p>
+                     <source src="{{video.url}}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                </video>                    
+                {% endfor %}
+            </ul>
         </div>
         <div id="Streamgraphs">
             {% for protocol in site.protocols.all %}
