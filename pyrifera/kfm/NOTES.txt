@@ -1,0 +1,10 @@
+Generating thumbnails
+---------------------
+
+To generate thumbnails for videos I used the following script:
+
+import os
+for file in os.listdir('/mnt/data/pyriferia/kfm_videos/'):
+    file = file.replace(' ', '\ ')
+    command = 'ffmpeg -i /mnt/data/pyriferia/kfm_videos/%s -ss 80 -s 480x320 /mnt/data/pyriferia/kfm_videos/%s.jpg' % (file, file,)
+    os.system(command)

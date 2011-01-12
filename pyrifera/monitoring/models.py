@@ -121,6 +121,8 @@ class SamplingSite(models.Model):
             pk__in=self.mean_densities.values_list('protocol').distinct()
                 ).order_by('name')
 
+    def first_video(self):
+        return [self.videos.all()[0]]
 
 class Taxon(models.Model):
     """Represents a particular species. 
@@ -273,3 +275,7 @@ class Video(models.Model):
     site = models.ForeignKey('SamplingSite', blank=False, related_name='videos')
     year = models.IntegerField(blank=False)
     url = models.URLField(blank=False, verify_exists=True)
+    full_thumbnail = models.URLField(null=True, verify_exists=True)
+    
+    class Meta:
+        ordering = ('-year', )

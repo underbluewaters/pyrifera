@@ -33,8 +33,9 @@ class Command(BaseCommand):
                 site, year = match.groups()
                 site = site[2:]
                 site = SamplingSite.objects.get(code=site)
-                video = Video(site=site, year=int(year), url=urljoin(
-                    prefix, line))
+                url = urljoin(prefix, line)
+                video = Video(site=site, year=int(year), url=url, 
+                    full_thumbnail=url.strip()+'.jpg')
                 video.save()
                 count += 1
         print "saved %s videos" % (count, )

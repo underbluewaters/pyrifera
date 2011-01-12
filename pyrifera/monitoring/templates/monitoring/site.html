@@ -1,6 +1,23 @@
 {% extends 'common/panel.html' %}
 {% block title %}{{site.name}}{% endblock title %}
 {% block panel %}
+    <script type="text/javascript" charset="utf-8">
+        lingcod.onShow(function(){
+            // a- tags with class "myPlayer" are transformed into video players
+            flowplayer("a.myPlayer", "http://releases.flowplayer.org/swf/flowplayer-3.2.5.swf");
+            
+            $('a.years').click(function(e){
+                $('.nowPlaying').removeClass('nowPlaying');
+                $('a.myPlayer').hide();
+                $($(this).attr('data-video')).show();
+                $(this).addClass('nowPlaying');
+                e.preventDefault();
+                return false;
+            });
+            
+            $('.years:first').click();
+        });
+    </script>
     <h1>{{site.name}}</h1>
     <div class="tabs">
         <ul>
@@ -18,13 +35,18 @@
                     <li>{{protocol.name}}</li>
                 {% endfor %}
             </ul>
-            <ul class="videos">
+            <div class="videos">
+                <h2>Underwater Video Transects</h2>
                 {% for video in site.videos.all %}
-                <video controls preload width="320" height="240">
-                     <source src="{{video.url}}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-                </video>                    
+                    <a class="myPlayer" id="video_{{video.pk}}"
+                    	href="{{video.url}}" {% if video.full_thumbnail %}style="background-image:url('{{video.full_thumbnail}}');"{% endif %}>
+                        <img src="{{MEDIA_URL}}/images/play_video.png" alt="{{video.site.name}} - {{video.year}}"/>
+                    </a>
                 {% endfor %}
-            </ul>
+                {% for video in site.videos.all %}
+                    <a class="years" data-video="#video_{{video.pk}}" href="#video_{{video.pk}}">{{video.year}}</a>
+                {% endfor %}
+            </div>
         </div>
         <div id="Streamgraphs">
             {% for protocol in site.protocols.all %}

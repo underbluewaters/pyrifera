@@ -2,6 +2,58 @@
 {% block headtwo %}
     <script type="text/javascript" src="{{MEDIA_URL}}protovis-3.2/protovis-r3.2.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}stream.js"></script>
+    <script src="{{MEDIA_URL}}flowplayer/example/flowplayer-3.2.4.min.js" type="text/javascript" charset="utf-8"></script>
+    <style id="videostyle" type="text/css" media="screen">
+        /* styling of the container. */
+
+        div.videos {
+            margin:0;
+            padding:0;
+            padding:15px;
+            margin-left:-15px;
+/*            width:490px;*/
+/*            overflow:hidden;*/
+/*            background-color:black;*/
+        }
+
+        a.myPlayer {
+        	display:none;
+        	width: 470px;
+        	height:313px; 
+        	text-align:center;
+        	margin:5px 0;
+/*          margin-left:-10px;*/
+        	padding:0;
+        	float:left;
+/*          border:1px solid #999;*/
+            border:none;
+        }
+
+        /* play button */
+        a.myPlayer img {
+        	margin-top:140px;
+        	border:0px;
+        }
+
+        /* when container is hovered we alter the border color */
+        a.myPlayer:hover {
+/*          border:1px solid #000;*/
+            border:none;
+        }
+
+        a.years {
+            text-decoration:none;
+        }
+
+        a.nowPlaying {
+            text-decoration:underline;
+        }
+
+        a.years:hover {
+            text-decoration:underline;
+        }
+    </style>
+
 {% endblock headtwo %}
 {% block tabs %}
     <li><a href="#Monitoring"><span>Monitoring Data</span></a></li>
