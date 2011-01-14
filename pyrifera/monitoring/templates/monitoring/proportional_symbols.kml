@@ -2,44 +2,17 @@
 <kml xmlns="http://www.opengis.net/kml/2.2" 
     xmlns:gx="http://www.google.com/kml/ext/2.2">
     <Document>
+        <Style id="defaultStyles">
+    		<IconStyle>
+    			<color>ff0078ff</color>
+    			<Icon>
+    				<href>{{MEDIA_URL}}images/prop_circle.png</href>
+    			</Icon>
+    		</IconStyle>
+    	</Style>
         <name>{{taxon.name}} Observations</name>
-        {% for observation in observations %}
-            <Placemark>
-                <name>{{observation.site.name}} - {{observation.taxon.name}}</name>
-                <visibility>1</visibility>
-                <Model>
-                    <visibility>1</visibility>
-                    <altitudeMode>relativeToGround</altitudeMode>
-                    <Location>
-                        <longitude>{{observation.site.point.x}}</longitude>
-                        <latitude>{{observation.site.point.y}}</latitude>
-                        <altitude>0</altitude>
-                    </Location>
-                    <Orientation>
-                        <heading>0</heading>
-                        <tilt>0</tilt>
-                        <roll>0</roll>
-                    </Orientation>
-                    <Scale>
-                        <x>200</x>
-                        <y>200</y>
-                        <z>200</z>
-                    </Scale>
-                    <Link>
-                        <href>{{MEDIA_URL}}sphere.dae</href>
-                    </Link>
-                </Model>
-            </Placemark>
-            <Placemark>
-                <name>{{observation.site.name}} - {{observation.taxon.name}}</name>
-                <description><![CDATA[
-                    <img src="http://intertidalweb.org/subtidal/subtidal/rpc/MultiAbundanceGraph.rpc.php?fish-EJAC=Embiotoca%20jacksoni&error_bars=0&site_code=SCI_PELICAN&scale=2" />
-                    <a href="{% url monitoring.views.species_site_data observation.taxon.pk observation.site.pk %}" rel="sidebar">More Info</a>
-                ]]>
-                </description>
-                <visibility>1</visibility>
-                {{observation.site.point.kml|safe}}
-            </Placemark>
+        {% for placemark in symbolizer.placemarks %}
+            {{ placemark|safe }}
         {% endfor %}
     </Document>
 </kml>

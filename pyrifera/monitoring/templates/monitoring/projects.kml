@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" 
     xmlns:gx="http://www.google.com/kml/ext/2.2">
+    {% load absurl %}
     <Document>
+        <Style id="chc">
+          <ListStyle>
+            <listItemType>checkHideChildren</listItemType>
+          </ListStyle>
+        </Style>
         {% for project in projects %}
             {{project.styles|safe}}
         {% endfor %}
@@ -19,7 +25,7 @@
                     {#  radio foldder with a "Sampling Sites" networklink and a Folder o#}
                     <Folder>
                         <name>Sampling Sites</name>
-                        <visibility>1</visibility>
+                        <visibility>0</visibility>
                         <open>0</open>                        
                         {% for site in project.sites.with_extras %}
                             <Placemark>
@@ -58,15 +64,19 @@
                         <Folder>
                             <name>All Protocols</name>
                             <open>0</open>
-                            <visibility>0</visibility>
                             {% for taxon in project.taxa %}
                                 <NetworkLink>
                                     <name>{{taxon.name}}</name>
-                                    <open>0</open>
                                     <visibility>0</visibility>
-                                    <flyToView>0</flyToView>
+                            		<Style>
+                            			<ListStyle>
+                            				<listItemType>checkHideChildren</listItemType>
+                            				<bgColor>00ffffff</bgColor>
+                            				<maxSnippetLines>2</maxSnippetLines>
+                            			</ListStyle>
+                            		</Style>
                                     <Link>
-                                        <href>{% url monitoring.views.proportional_symbols taxon.pk %}</href>
+                                        <href>{% absurl monitoring.views.proportional_symbols taxon.pk %}</href>
                                     </Link>
                                 </NetworkLink>
                             {% endfor %}
@@ -78,16 +88,6 @@
                                 <visibility>0</visibility>
                             </Folder>
                         {% endfor %}
-                        <NetworkLink>
-                            <name>Example proportional symbol display</name>
-                            <visibility>0</visibility>
-                            <open>0</open>
-                            <refreshVisibility>0</refreshVisibility>
-                            <flyToView>0</flyToView>
-                            <Link>
-                                <href>http://sites.google.com/site/thematicmapping2/population_2005_collada_sphere.kmz</href>
-                            </Link>
-                        </NetworkLink>
                     </Folder>
                 </Folder>
             {% endfor %}
