@@ -4,8 +4,8 @@
         <contributor>
             <authoring_tool>Google SketchUp 8.0.4810</authoring_tool>
         </contributor>
-        <created>2011-01-13T23:02:04Z</created>
-        <modified>2011-01-13T23:02:04Z</modified>
+        <created>2011-01-18T18:34:07Z</created>
+        <modified>2011-01-18T18:34:07Z</modified>
         <unit meter="0.0254000" name="inch" />
         <up_axis>Z_UP</up_axis>
     </asset>
@@ -124,10 +124,10 @@
                 <technique sid="COMMON">
                     <lambert>
                         <diffuse>
-                            <color>1.0000000 1.0000000 0.0000000 0.5019608</color>
+                            <color>1.0000000 1.0000000 0.0000000 0.4000000</color>
                         </diffuse>
                         <transparent opaque="RGB_ZERO">
-                            <color>0.4980392 0.4980392 0.4980392 0.4980392</color>
+                            <color>0.6000000 0.6000000 0.6000000 0.6000000</color>
                         </transparent>
                         <transparency>
                             <float>1.0000000</float>

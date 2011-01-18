@@ -20,6 +20,7 @@ class Command(BaseCommand):
         """
         kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
         saved = import_data(path, kfm, 'Quadrat: 5 Meter', u"# per m\u00B2", 
+            u"per m\u00B2",
             site='SiteCode', 
             taxon='Species', 
             year='Year', 

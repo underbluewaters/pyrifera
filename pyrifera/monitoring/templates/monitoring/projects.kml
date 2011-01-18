@@ -65,20 +65,22 @@
                             <name>All Protocols</name>
                             <open>0</open>
                             {% for taxon in project.taxa %}
-                                <NetworkLink>
-                                    <name>{{taxon.name}}</name>
-                                    <visibility>0</visibility>
-                            		<Style>
-                            			<ListStyle>
-                            				<listItemType>checkHideChildren</listItemType>
-                            				<bgColor>00ffffff</bgColor>
-                            				<maxSnippetLines>2</maxSnippetLines>
-                            			</ListStyle>
-                            		</Style>
-                                    <Link>
-                                        <href>{% absurl monitoring.views.proportional_symbols taxon.pk %}</href>
-                                    </Link>
-                                </NetworkLink>
+                                {% for protocol in taxon.protocols.all %}
+                                    <NetworkLink>
+                                        <name>{{taxon.name}} - {{protocol.name}}</name>
+                                        <visibility>0</visibility>
+                                		<Style>
+                                			<ListStyle>
+                                				<listItemType>checkHideChildren</listItemType>
+                                				<bgColor>00ffffff</bgColor>
+                                				<maxSnippetLines>2</maxSnippetLines>
+                                			</ListStyle>
+                                		</Style>
+                                        <Link>
+                                            <href>{% absurl monitoring.views.proportional_symbols taxon.pk protocol.pk %}</href>
+                                        </Link>
+                                    </NetworkLink>                                    
+                                {% endfor %}
                             {% endfor %}
                         </Folder>
                         {% for protocol in project.protocol_set.all %}

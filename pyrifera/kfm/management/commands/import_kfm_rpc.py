@@ -19,6 +19,7 @@ class Command(BaseCommand):
         """
         kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
         saved = import_data(path, kfm, 'Random Point Contact', "% cover", 
+            u"%",
             site='SiteCode', 
             taxon='Species', 
             year='Year', 

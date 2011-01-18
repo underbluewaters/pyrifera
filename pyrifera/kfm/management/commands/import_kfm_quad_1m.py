@@ -19,7 +19,8 @@ class Command(BaseCommand):
         This command _will_ overwrite existing observations.
         """
         kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
-        saved = import_data(path, kfm, 'Quadrat: 1 Meter', u"# per m\u00B2", 
+        saved = import_data(path, kfm, 'Quadrat: 1 Meter', u"# per m\u00B2",
+            u"per m\u00B2",
             site='SiteCode', 
             taxon='Species', 
             year='Year', 

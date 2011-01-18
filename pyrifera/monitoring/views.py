@@ -3,7 +3,7 @@ from monitoring.models import *
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 import json
-from symbolizers import ColladaSymbolizer
+from symbolizers import ColladaSymbolizer, ScaledImageSymbolizer
 
 def projects(request):
     """Renders a kml file representing projects."""
@@ -54,13 +54,16 @@ def species_lists(request, pk):
             'protocols': site.protocols.all()
         }, context_instance=RequestContext(request))
 
-def proportional_symbols(request, pk):
+def proportional_symbols(request, pk, protocol_pk):
     taxon = get_object_or_404(Taxon, pk=pk)
-    observations = MeanDensity.objects.filter(taxon=taxon).order_by(
+    protocol = get_object_or_404(Protocol, pk=protocol_pk)
+    observations = MeanDensity.objects.filter(taxon=taxon, protocol=protocol).order_by(
         'year').select_related('site')
     symbolizer = ColladaSymbolizer(observations)
+    symbolizer = ScaledImageSymbolizer(observations)
     return render_to_response('monitoring/proportional_symbols.kml', {
             "taxon": taxon,
+            "protocol": protocol,
             "observations": observations,
             'symbolizer': symbolizer,
         }, mimetype="application/vnd.google-earth.kml+xml", 

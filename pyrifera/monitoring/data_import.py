@@ -8,7 +8,7 @@ from monitoring.models import *
 REQUIRED = ('site', 'taxon', 'year', 'mean', 'stderror')
 
 @transaction.commit_on_success
-def import_data(path, project, protocol_name, unit_name, **kwargs):
+def import_data(path, project, protocol_name, unit_name, unit_suffix, **kwargs):
     for kwarg in REQUIRED:
         if kwarg not in kwargs:
             raise KeyError('import data requires a "%s" keyword argument' \
@@ -19,7 +19,7 @@ def import_data(path, project, protocol_name, unit_name, **kwargs):
             print "Protocol %s already exists. Removed old records" % (
                 protocol_name, )
         except:
-            unit = Unit(name=unit_name)
+            unit = Unit(name=unit_name, suffix=unit_suffix)
             unit.save()
             protocol = Protocol(
                 name=protocol_name, 

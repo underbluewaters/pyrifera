@@ -167,14 +167,22 @@ class Taxon(models.Model):
             self.scientific_name is '':
             raise ValidationError('Taxon %s must have a common_name, '+
                 'genus or scientific_name.' % (self.code))
+    
+    def protocols(self):
+        return Protocol.objects.filter(pk__in=MeanDensity.objects.filter(
+            taxon=self).values_list('protocol', flat=True).distinct())
 
 
 class Unit(models.Model):
     u"""Describes the unit used in the sampling protocol, 
     for example: "# per m\u00B2". 
     
+    Suffix is attached to the end of numbers in the UI. As in the above 
+    example a record of 4 would be displayed as "4 per m\u00B2"
+    
     """
     name = models.CharField(max_length=10)
+    suffix = models.CharField(max_length=10)
 
     def __unicode__(self):
         return self.name
