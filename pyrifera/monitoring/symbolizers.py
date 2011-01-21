@@ -152,6 +152,62 @@ class ScaledImageSymbolizer:
                     <name>%s - %s %s</name>
                     <description>
                         %s - %s (%s)
+                        <![CDATA[
+                        <div id="clock"></div>                        
+                        <script type="text/javascript" src="http://mm-01.msi.ucsb.edu/~cburt/pyrifera-media/protovis-3.2/protovis-r3.2.js"></script> 
+                        <script type="text/javascript+protovis"> 
+                        setInterval("tick()",50); 
+                        console.log('hi');
+                        var data = pv.range(0, 10, .1).map(function(x) {
+                            return {x: x, y: Math.sin(x) + Math.random() * .5 + 2};
+                          });
+                        /* Sizing and scales. */
+                        var w = 400,
+                            h = 200,
+                            x = pv.Scale.linear(data, function(d) d.x).range(0, w),
+                            y = pv.Scale.linear(0, 4).range(0, h);
+                            document.getElementById("clock").innerHTML=pv;
+                        /* The root panel. */
+                        var vis = new pv.Panel()
+                            .width(w)
+                            .height(h)
+                            .bottom(20)
+                            .left(20)
+                            .right(10)
+                            .top(5);
+
+                        /* Y-axis and ticks. */
+                        vis.add(pv.Rule)
+                            .data(y.ticks(5))
+                            .bottom(y)
+                            .strokeStyle(function(d) d ? "#eee" : "#000")
+                          .anchor("left").add(pv.Label)
+                            .text(y.tickFormat);
+
+                        /* X-axis and ticks. */
+                        vis.add(pv.Rule)
+                            .data(x.ticks())
+                            .visible(function(d) d)
+                            .left(x)
+                            .bottom(-5)
+                            .height(5)
+                          .anchor("bottom").add(pv.Label)
+                            .text(x.tickFormat);
+
+                        /* The area with top line. */
+                        vis.add(pv.Area)
+                            .data(data)
+                            .bottom(1)
+                            .left(function(d) x(d.x))
+                            .height(function(d) y(d.y))
+                            .fillStyle("rgb(121,173,210)")
+                          .anchor("top").add(pv.Line)
+                            .lineWidth(3);
+
+                        vis.render();
+                        console.log('blah');
+
+                            </script>]]> 
                     </description>
                     %s
                 </Placemark>
