@@ -43,7 +43,7 @@ def site(request, pk):
     # streamgraph_data = streamgraph_data + "}"
     return render_to_response('monitoring/site.html', {
         'site': site,
-        # 'streamgraph_data': streamgraph_data,
+        'temperatures': ", ".join([("{'date':new Date('%s'), 'celsius': %s}" % (t.date.ctime(), t.celsius)) for t in site.watertemperature_set.all().order_by('date')]),
         }, 
         context_instance=RequestContext(request))
     

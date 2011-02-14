@@ -16,6 +16,19 @@
             });
             
             $('.years:first').click();
+            
+            pv.$ = {i:0, x:document.getElementsByTagName("script")};
+            for (; pv.$.i < pv.$.x.length; pv.$.i++) {
+              pv.$.s = pv.$.x[pv.$.i];
+              if (pv.$.s.type == "text/javascript+protovis") {
+                try {
+                  window.eval(pv.parse(pv.$.s.text));
+                } catch (e) {
+                  pv.error(e);
+                }
+              }
+            }
+            delete pv.$;
         });
     </script>
     <h1>{{site.name}}</h1>
@@ -29,6 +42,34 @@
         <div id="SiteInfo">
             <p class="project">A {{site.project.name}} Site</p>
             <p class="dates"><a href="http://intertidalweb.org/subtidal/subtidal/pages/timeline.php#SCI_PELICAN">1985-2009 <- graphic display here</a></p>
+            {% if temperatures %}
+                <script type="text/javascript+protovis">
+                    console.log('start');
+                    var w = 400;
+                    var h = 200;
+                    var data = [{{temperatures|safe}}];
+                    console.log((data[0].date, data[data.length-1].date));
+                    var x = pv.Scale.linear(data[0].date, data[data.length-1].date).range(0, w);
+                    var y = pv.Scale.linear(0, 40).range(0, h);
+                    console.log(data.length);
+                    
+                    var vis = new pv.Panel()
+                        .width(w)
+                        .height(h)
+                        .bottom(20)
+                        .left(20)
+                        .right(10)
+                        .top(5);
+                    // 
+                    vis.add(pv.Line)
+                        .data(data)
+                        .left(function(d) x(d.x))
+                        // .bottom(function(d) y(d.y))
+                        // .lineWidth(3);
+                
+                    vis.render();
+                </script>
+            {% endif %}
             <h4>sampled here</h4>
             <ul>
                 {% for protocol in site.protocols.all %}

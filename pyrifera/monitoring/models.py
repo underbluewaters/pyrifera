@@ -123,7 +123,7 @@ class SamplingSite(models.Model):
 
     def first_video(self):
         return [self.videos.all()[0]]
-
+    
 class Taxon(models.Model):
     """Represents a particular species. 
     Also represents concepts like blue rockfish recruit(<10cm) and 
@@ -287,3 +287,11 @@ class Video(models.Model):
     
     class Meta:
         ordering = ('-year', )
+        
+class WaterTemperature(models.Model):
+    """Represents a recording of water temperature at a given site and date
+    in degrees celsius.
+    """
+    site = models.ForeignKey('SamplingSite', blank=False)
+    date = models.DateTimeField(blank=False)
+    celsius = models.DecimalField(blank=False, max_digits=5, decimal_places=3)
