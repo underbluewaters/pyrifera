@@ -150,13 +150,13 @@ class ScaledImageSymbolizer:
             			</IconStyle>
             		</Style>
                     <name>%s - %s %s</name>
-                    <description>
+                    <description><![CDATA[
                         %s - %s (%s)
-                        <![CDATA[
-                        <div id="clock"></div>                        
-                        <script type="text/javascript" src="http://mm-01.msi.ucsb.edu/~cburt/pyrifera-media/protovis-3.2/protovis-r3.2.js"></script> 
+                        <script type="text/javascript">
+                            console.log('hi there');
+                        </script>
+                        <script type="text/javascript" src="http://localhost/~cburt/pyrifera-media/protovis-3.2/protovis-r3.2.js"></script> 
                         <script type="text/javascript+protovis"> 
-                        setInterval("tick()",50); 
                         console.log('hi');
                         var data = pv.range(0, 10, .1).map(function(x) {
                             return {x: x, y: Math.sin(x) + Math.random() * .5 + 2};
@@ -166,7 +166,6 @@ class ScaledImageSymbolizer:
                             h = 200,
                             x = pv.Scale.linear(data, function(d) d.x).range(0, w),
                             y = pv.Scale.linear(0, 4).range(0, h);
-                            document.getElementById("clock").innerHTML=pv;
                         /* The root panel. */
                         var vis = new pv.Panel()
                             .width(w)
@@ -207,9 +206,15 @@ class ScaledImageSymbolizer:
                         vis.render();
                         console.log('blah');
 
-                            </script>]]> 
-                    </description>
+                            </script>
+                    ]]></description>
                     %s
+                    <ExtendedData>                       
+                      <Data name="string">
+                        <displayName>key</displayName>    <!-- string -->
+                        <value>blah</value>                <!-- string -->
+                      </Data>
+                    </ExtendedData>
                 </Placemark>
             """ % ( record.year, record.year,
                 scale,

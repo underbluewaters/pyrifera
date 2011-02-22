@@ -38,6 +38,7 @@ def import_data(path, project, protocol_name, unit_name, unit_suffix, **kwargs):
                 code=row[kwargs['taxon']], project=project)
             site = SamplingSite.objects.get(
                 code=row[kwargs['site']].upper(), project=project)
+            print row
             md = MeanDensity(
                 protocol=protocol,
                 site=site,
