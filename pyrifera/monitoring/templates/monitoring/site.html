@@ -1,6 +1,33 @@
 {% extends 'common/panel.html' %}
 {% block title %}{{site.name}}{% endblock title %}
 {% block panel %}
+    <style type="text/css" media="screen">
+    svg {
+        shape-rendering: auto;
+    }
+    
+        .rule line {
+          stroke: #eee;
+        }
+
+        .rule line.axis {
+          stroke: #000;
+        }
+
+        .area {
+          fill: lightsteelblue;
+        }
+
+        .line, circle.area {
+          fill: none;
+          stroke: steelblue;
+          stroke-width: 0.75px;
+        }
+
+        circle.area {
+          fill: #fff;
+        }
+    </style>
     <script type="text/javascript" charset="utf-8">
         lingcod.onShow(function(){
             // a- tags with class "myPlayer" are transformed into video players
@@ -17,18 +44,229 @@
             
             $('.years:first').click();
             
-            pv.$ = {i:0, x:document.getElementsByTagName("script")};
-            for (; pv.$.i < pv.$.x.length; pv.$.i++) {
-              pv.$.s = pv.$.x[pv.$.i];
-              if (pv.$.s.type == "text/javascript+protovis") {
-                try {
-                  window.eval(pv.parse(pv.$.s.text));
-                } catch (e) {
-                  pv.error(e);
+            {% if temperatures %}
+            var data = [{{temperatures|safe}}];
+            
+            var monthly_average = [];
+            for(var i = 0; i<data.length; i++){
+                var date = data[i].date;
+                var first = new Date(date.getFullYear(), date.getMonth(), 1, 1, 1, 1);
+                if(!monthly_average[first]){
+                    monthly_average[first] = {
+                        n: 0,
+                        sum: 0,
+                        average: null
+                    };
                 }
-              }
+                monthly_average[first].n += 1;
+                monthly_average[first].sum += data[i].celsius;
             }
-            delete pv.$;
+
+            
+            var monthly = [];
+            for(var date in monthly_average){
+                var r = monthly_average[date];
+                r.average = r.sum / r.n;
+                r.celsius = r.average;
+                r.date = new Date(date);
+                monthly.push(r);
+            }
+            window.monthly = monthly;
+
+            d3.select('#temp')
+                .append('h3')
+                    .text('Temperature')
+            
+            var w = 430,
+                h = 90,
+                min = d3.min(data, function(d){return d.celsius}),
+                max = d3.max(data, function(d){return d.celsius}),
+                earliest = d3.min(data, function(d){return d.date}),
+                latest = d3.max(data, function(d){return d.date}),
+                pv = 25,
+                ph = 10,
+                x = d3.scale.linear().domain([earliest, latest]).range([0, w]),
+                y = d3.scale.linear().domain([min, max]).range([h, 0])
+                daily_color = "#B7C5CD",
+                monthly_color = "#2A4AAF";
+                
+            var years = [new Date(earliest.getFullYear(), 1, 1, 1, 1, 1)];
+            var c = earliest;
+            while(c.getFullYear() < latest.getFullYear()){
+                c = new Date(c.getFullYear() + 1, 1, 1, 1, 1, 1);
+                years.push(new Date(c.getTime()));
+            }
+            window.years = years;
+
+            var vis = d3.select('#temp')
+                .append('svg:svg')
+                    .attr('id', 'panel')
+                    .attr('width', w + ph * 2)
+                    .attr('height', h + pv * 2)
+                    .on("mousemove", update)
+                    .on('mouseout', function(){update(true)})
+                    .append("svg:g")
+                      .attr("transform", "translate(" + ph + "," + pv + ")");
+            
+            vis.selectAll("svg:path")
+                .data([data]).enter()
+                .append('svg:path')
+              .attr("d", d3.svg.line()
+                .x(function(d) { return x(d.date); })
+                .y(function(d) { return y(d.celsius)}))
+              .attr('style', 'stroke: '+daily_color+';')
+              .attr('class','line')
+              
+              vis.selectAll("svg:path")
+                  .data([monthly]).enter()
+                  .append('svg:path')
+                .attr("d", d3.svg.line()
+                  .x(function(d) { return x(d.date); })
+                  .y(function(d) { return y(d.celsius)})
+                  .interpolate('cardinal')
+                  .tension(0.65))
+                .attr('style', 'stroke: '+monthly_color+';')
+                .attr('class','line')
+            
+            var daily_label = vis.append("svg:text")
+                .attr('id', 'daily_legend')
+                .attr("y", 0)
+                .attr("x", w - 110)
+                .attr("fill", daily_color)
+                .attr("text-anchor", "end")
+                .text('● daily avg')
+                .attr('style', 'font-size: 0.8em;')
+
+            var monthly_label = vis.append("svg:text")
+                .attr('id', 'monthly_legend')
+                .attr("y", 0)
+                .attr("x", w)
+                .attr("fill", monthly_color)
+                .attr("text-anchor", "end")
+                .text('● monthly avg')
+                .attr('style', 'font-size: 0.8em;')
+                .attr('opacity', '0.8')
+            
+            var year_labels = vis.selectAll('text.year_label')
+                .data(years).enter()
+                .append('svg:text')
+                .text(function(d){return d.getFullYear()})
+                .attr('x', function(d){return x(d)})
+                .attr('y', h + 14)
+                .attr('style', 'font-size: 0.6em;')
+            
+            var selectedData = [];
+            var selectedDaily = [];
+            var selectedMonthly = [];
+            var uscale = (latest.getTime() - earliest.getTime()) / w;
+            var timeout;
+            var date = null;
+            function update(a) {
+                if(timeout){
+                    clearTimeout(timeout);
+                }
+                date = new Date(earliest.getTime() + uscale * (d3.svg.mouse(d3.select('#panel')[0][0])[0] - ph));
+                timeout = setTimeout(function(){
+                    var original = latest;
+                    if(selectedData[0]){
+                        original = new Date(selectedData[0].getTime());
+                    }
+                    selectedData.pop();
+                    timeout = null;
+                    if(!a){
+                        selectedData.push(date);
+                    }
+                    var selected = vis.selectAll("line.selected")
+                        .data(selectedData, function(d){return d.getTime()});
+
+                    selected.enter()
+                        .insert('svg:line', 'path')
+                            .attr('class', 'selected')
+                            .attr('stroke', '#FFF2BA')
+                            .attr('stroke-width', '8px')
+                            .attr('x1', function(d){return x(original)})
+                            .attr('x2', function(d){return x(original)})
+                            .attr("y1", 0)
+                            .attr("y2", h)
+                            .transition().duration(300)
+                                .attr('x1', function(d, i, b){return x(d)})
+                                .attr('x2', function(d, i, b){return x(d)})
+                    
+                    selected.exit().remove();
+                    
+                    var selected_date = new Date(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0);
+                    var selected_record = false;
+                    for(var i = 0; i<data.length;i++){
+                        if(data[i].date.getTime() == selected_date.getTime()){
+                            selected_record = data[i];
+                            break;                            
+                        }
+                    }
+                    selectedDaily.pop();             
+                    if(selected_record){
+                        if(!a){
+                            selectedDaily.push(selected_record);
+                        }
+                    }
+                    var dailypin = vis.selectAll('circle.dailypin')
+                        .data(selectedDaily, function(d){return d.date.getTime()})
+                    
+                    dailypin.enter()
+                        .insert('svg:circle')
+                            .attr('class', 'dailypin')
+                            .attr('stroke', 'black')
+                            .attr('stroke-width', 0.5)
+                            .attr('cx', function(d){return x(d.date);})
+                            .attr('cy', function(d){return y(d.celsius);})
+                            .attr('r', 2)
+                            .attr('fill', '#CCC')
+                            
+                    dailypin.exit().remove();
+                    
+                    var selected_month = new Date(date.getFullYear(), date.getMonth(), 1, 1, 1, 1);
+                    var selected_month_record = false;
+                    for(var i = 0; i<monthly.length;i++){
+                        if(monthly[i].date.getTime() == selected_month.getTime()){
+                            selected_month_record = monthly[i];
+                            break;             
+                        }
+                    }
+                    selectedMonthly.pop();             
+                    if(selected_month_record){
+                        if(!a){
+                            selectedMonthly.push(selected_month_record);
+                        }
+                    }
+                    var monthlypin = vis.selectAll('circle.monthly')
+                        .data(selectedMonthly, function(d){return d.date.getTime()})
+                    
+                    monthlypin.enter()
+                        .insert('svg:circle')
+                            .attr('class', 'monthly')
+                            .attr('stroke', 'black')
+                            .attr('stroke-width', 0.5)
+                            .attr('cx', function(d){return x(d.date);})
+                            .attr('cy', function(d){return y(d.celsius);})
+                            .attr('r', 2)
+                            .attr('fill', '#004080')
+
+                    monthlypin.exit().remove();
+                    
+                    
+                    if(!a){
+                        vis.select('#monthly_legend')
+                            .text(selected_month_record ? Math.round(selected_month_record.celsius * 100) / 100 + ' monthly avg' : '● monthly avg')
+                        vis.select('#daily_legend')
+                            .text(selected_record ? Math.round(selected_record.celsius * 100) / 100 + ' daily avg' : '● daily avg')
+                    }else{
+                        vis.select('#monthly_legend')
+                            .text('● monthly avg')                        
+                        vis.select('#daily_legend')
+                            .text('● daily avg')                        
+                    }
+                }, 5);
+            }
+            {% endif %}
         });
     </script>
     <h1>{{site.name}}</h1>
@@ -42,40 +280,13 @@
         <div id="SiteInfo">
             <p class="project">A {{site.project.name}} Site</p>
             <p class="dates"><a href="http://intertidalweb.org/subtidal/subtidal/pages/timeline.php#SCI_PELICAN">1985-2009 <- graphic display here</a></p>
-            {% if temperatures %}
-                <script type="text/javascript+protovis">
-                    console.log('start');
-                    var w = 400;
-                    var h = 200;
-                    var data = [{{temperatures|safe}}];
-                    console.log((data[0].date, data[data.length-1].date));
-                    var x = pv.Scale.linear(data[0].date, data[data.length-1].date).range(0, w);
-                    var y = pv.Scale.linear(0, 40).range(0, h);
-                    console.log(data.length);
-                    
-                    var vis = new pv.Panel()
-                        .width(w)
-                        .height(h)
-                        .bottom(20)
-                        .left(20)
-                        .right(10)
-                        .top(5);
-                    // 
-                    vis.add(pv.Line)
-                        .data(data)
-                        .left(function(d) x(d.x))
-                        // .bottom(function(d) y(d.y))
-                        // .lineWidth(3);
-                
-                    vis.render();
-                </script>
-            {% endif %}
             <h4>sampled here</h4>
             <ul>
                 {% for protocol in site.protocols.all %}
                     <li>{{protocol.name}}</li>
                 {% endfor %}
             </ul>
+            <div id="temp"></div>
             <div class="videos">
                 <h2>Underwater Video Transects</h2>
                 {% for video in site.videos.all %}
