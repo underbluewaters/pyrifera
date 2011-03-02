@@ -43,14 +43,30 @@
             });
             
             $('.years:first').click();
-            
+                        
             {% if temperatures %}
+            // ====== Begin Temperature visualization code =======
+            
+            Array.prototype.binarySearch = function binarySearch(find, comparator) {
+                var low = 0, high = this.length - 1,
+                    i, comparison;
+                while (low <= high) {
+                    i = parseInt((low + high) / 2, 10);
+                    comparison = comparator(this[i], find);
+                    if (comparison < 0) { low = i + 1; continue; };
+                    if (comparison > 0) { high = i - 1; continue; };
+                    return i;
+                }
+                return i;
+            };
+            
             var data = [{{temperatures|safe}}];
             
             var monthly_average = [];
             for(var i = 0; i<data.length; i++){
                 var date = data[i].date;
-                var first = new Date(date.getFullYear(), date.getMonth(), 1, 1, 1, 1);
+                var first = new Date(
+                    date.getFullYear(), date.getMonth(), 1, 1, 1, 1);
                 if(!monthly_average[first]){
                     monthly_average[first] = {
                         n: 0,
@@ -69,131 +85,177 @@
                 r.average = r.sum / r.n;
                 r.celsius = r.average;
                 r.date = new Date(date);
-                monthly.push(r);
+                if(r.date > data[0].date){
+                    monthly.push(r);                    
+                }
             }
-            window.monthly = monthly;
 
             d3.select('#temp')
                 .append('h3')
-                    .text('Temperature')
+                    .text('Temperature (degrees celsius)')
             
-            var w = 430,
-                h = 90,
+            var w = 470,                        // width
+                h = 110,                         // height
+                pt = 5,                         // padding top
+                pb = 5                          // bottom
+                pl = 20,                        // left
+                pr = 5,                         // right
+                yaxisw = 13,                    // y axis labels width
+                xaxish = 35,                    // x axis labels height
+                legendh = 25,                   // legend height
+                dw = w - (pr + pl + yaxisw),    // data range width in pixels
+                dh = h - (pt + pb + xaxish + legendh),  // data height in px
+                daily_color = "#B7C5CD",
+                monthly_color = "#2A4AAF",
                 min = d3.min(data, function(d){return d.celsius}),
                 max = d3.max(data, function(d){return d.celsius}),
                 earliest = d3.min(data, function(d){return d.date}),
                 latest = d3.max(data, function(d){return d.date}),
-                pv = 25,
-                ph = 20,
-                x = d3.scale.linear().domain([earliest, latest]).range([0, w]),
-                y = d3.scale.linear().domain([min, max]).range([h, 0])
-                daily_color = "#B7C5CD",
-                monthly_color = "#2A4AAF";
-            console.log(latest);
-			console.log(earliest);
+                x = d3.scale.linear().domain(
+                    [earliest, latest]).range([0, dw]),
+                y = d3.scale.linear().domain([min, max]).range([dh, 0]);
+
             var years = [];
 			if(earliest.getDay() == 1 && earliest.getMonth() == 1){
-				years.push([new Date(earliest.getFullYear(), 1, 1, 1, 1, 1)]);				
+				years.push([new Date(earliest.getFullYear(), 0, 1, 1, 1, 1)]);				
 			}
             var c = earliest;
             while(c.getFullYear() < latest.getFullYear()){
-                c = new Date(c.getFullYear() + 1, 1, 1, 1, 1, 1);
+                c = new Date(c.getFullYear() + 1, 0, 1, 1, 1, 1);
                 years.push(new Date(c.getTime()));
             }
-            window.years = years;
-
             var vis = d3.select('#temp')
                 .append('svg:svg')
                     .attr('id', 'panel')
-                    .attr('width', w + ph * 2)
-                    .attr('height', h + pv * 2)
+                    .attr('width', w)
+                    .attr('height', h)
                     .on("mousemove", update)
                     .on('mouseout', function(){update(true)})
-                    // .append("svg:g")
-                    //   .attr("transform", "translate(" + ph + "," + pv + ")");
-            
-            vis.selectAll("svg:path")
-                .data([data]).enter()
-                .append('svg:path')
-              .attr("d", d3.svg.line()
-                .x(function(d) { return x(d.date) + ph; })
-                .y(function(d) { return y(d.celsius)}))
-              .attr('style', 'stroke: '+daily_color+';')
-              .attr('class','line')
-              
-              vis.selectAll("svg:path")
-                  .data([monthly]).enter()
-                  .append('svg:path')
-                .attr("d", d3.svg.line()
-                  .x(function(d) { return x(d.date) + ph; })
-                  .y(function(d) { return y(d.celsius)})
-                  .interpolate('cardinal')
-                  .tension(0.65))
-                .attr('style', 'stroke: '+monthly_color+';')
-                .attr('class','line')
             
             var daily_label = vis.append("svg:text")
-                .attr('id', 'daily_legend')
-                .attr("y", 0)
-                .attr("x", (w) - 110)
+                .attr('class', 'daily_legend')
+                .attr("y", pt + 10)
+                .attr("x", (w) - (110 + pr))
                 .attr("fill", daily_color)
                 .attr("text-anchor", "end")
                 .text('● daily avg')
                 .attr('style', 'font-size: 0.8em;')
 
             var monthly_label = vis.append("svg:text")
-                .attr('id', 'monthly_legend')
-                .attr("y", 0)
-                .attr("x", w)
+                .attr('class', 'monthly_legend')
+                .attr("y", pt + 10)
+                .attr("x", w - pr)
                 .attr("fill", monthly_color)
                 .attr("text-anchor", "end")
                 .text('● monthly avg')
                 .attr('style', 'font-size: 0.8em;')
                 .attr('opacity', '0.8')
+    
+            var g = vis.append('svg:g')
+                .attr('transform', "translate("+(pl + yaxisw)+","+(pt + legendh)+")")
             
-            
-			var max_year_labels = (w + ph * 2) / (21 + 25);
-			
+            g.selectAll("svg:path")
+                .data([data]).enter()
+                .append('svg:path')
+              .attr("d", d3.svg.line()
+                .x(function(d) { return x(d.date); })
+                .y(function(d) { return y(d.celsius)}))
+              .attr('style', 'stroke: '+daily_color+';')
+              .attr('class','line')
+              
+             g.selectAll("svg:path")
+                  .data([monthly]).enter()
+                  .append('svg:path')
+                .attr("d", d3.svg.line()
+                  .x(function(d) { return x(d.date); })
+                  .y(function(d) { return y(d.celsius)})
+                  .interpolate('cardinal')
+                  .tension(0.65))
+                .attr('style', 'stroke: '+monthly_color+';')
+                .attr('class','line')
+                        
+            // Determines how many year labels can fit on the x-axis
+			var max_year_labels = dw / (21 + 25);
 
-			var year_labels = vis.selectAll('text.year_label')
+			var year_labels = g.selectAll('text.year_label')
                 .data(years).enter()
                 .append('svg:text')
                 .text(function(d){return d.getFullYear()})
-                .attr('x', function(d){return x(d) + ph})
-                .attr('y', h + 24)
+                .attr('x', function(d){return x(d)})
+                .attr('y', dh + 20)
 				.attr('opacity', function(d, i){ return i % Math.round(years.length / max_year_labels) ? '0' : '1'})
                 .attr('style', 'font-size: 0.7em;text-anchor:middle;')
 
-            var year_tics = vis.selectAll('line.year')
+            var year_tics = g.selectAll('line.year')
                 .data(years).enter()
                 .append('svg:line')
-                .attr('x1', function(d){return x(d) + ph})
-                .attr('y1', h + 10)
-                .attr('x2', function(d){return x(d) + ph})
-                .attr('y2', h + 5)
+                .attr('class', 'year')
+                .attr('x1', function(d){return x(d)})
+                .attr('y1', dh + 10)
+                .attr('x2', function(d){return x(d)})
+                .attr('y2', dh + 5)
 				.attr('style', 'stroke:black;stroke-width:1;')
 
-            var month_tics = vis.selectAll('line.month')
+            var month_tics = g.selectAll('line.month')
                 .data(monthly).enter()
                 .append('svg:line')
-                .attr('x1', function(d){return x(d.date) + ph})
-                .attr('y1', h + 8)
-                .attr('x2', function(d){return x(d.date) + ph})
-                .attr('y2', h + 7)
+                .attr('class', 'month')
+                .attr('x1', function(d){return x(d.date)})
+                .attr('y1', dh + 8)
+                .attr('x2', function(d){return x(d.date)})
+                .attr('y2', dh + 7)
 				.attr('style', 'stroke:black;stroke-width:0.5;')
+			
+			
+			var yaxis_labels = g.selectAll('text.celsius')
+			    .data(y.ticks(4)).enter()
+			        .append('svg:text')
+			        .text(function(d){return Math.round(d * 100) / 100 + '°'})
+			        .attr('x', 0 - yaxisw - 16)
+			        .attr('y', function(d){return y(d) + 2})
+			        .attr('style', 'font-size: 0.7em;')
+
+			var yaxis_ticks = g.selectAll('line.celsius')
+			    .data(y.ticks(4)).enter()
+			        .append('svg:line')
+			        .attr('class', 'celsius')
+                    .attr('x1', 0 - yaxisw + 5)
+                    .attr('y1', function(d){return y(d)})
+                    .attr('x2', 0 - yaxisw)
+                    .attr('y2', function(d){return y(d)})
+    				.attr('style', 'stroke:black;stroke-width:1px;')
+
+			var yaxis_minor_ticks = g.selectAll('line.minor_celsius')
+			    .data(y.ticks(10)).enter()
+			        .append('svg:line')
+			        .attr('class', 'minor_celsius')
+                    .attr('x1', 0 - yaxisw + 5)
+                    .attr('y1', function(d){return y(d)})
+                    .attr('x2', 0 - yaxisw + 3)
+                    .attr('y2', function(d){return y(d)})
+    				.attr('style', 'stroke:black;stroke-width:1px;')
             
             var selectedData = [];
             var selectedDaily = [];
             var selectedMonthly = [];
-            var uscale = (latest.getTime() - earliest.getTime()) / w + ph * 2;
+            var interp = d3.interpolate(0, dw);
             var timeout;
-            var date = null;
+            var date = null;            
             function update(a) {
                 if(timeout){
                     clearTimeout(timeout);
                 }
-                date = new Date(earliest.getTime() + uscale * (d3.svg.mouse(d3.select('#panel')[0][0])[0] - ph));
+                var mousex = d3.svg.mouse(vis.select('g')[0][0])[0];
+                if(mousex < 0){
+                    a = true;
+                }
+                date = x.invert(mousex);
                 timeout = setTimeout(function(){
+                    date.setHours(0);
+                    date.setMinutes(0);
+                    date.setSeconds(0);
+                    date.setMilliseconds(0);
+                    var selected_date = date;
                     var original = latest;
                     if(selectedData[0]){
                         original = new Date(selectedData[0].getTime());
@@ -201,41 +263,38 @@
                     selectedData.pop();
                     timeout = null;
                     if(!a){
-                        selectedData.push(date);
+                        selectedData.push(selected_date);
                     }
-                    var selected = vis.selectAll("line.selected")
+                    var selected = g.selectAll("line.selected")
                         .data(selectedData, function(d){return d.getTime()});
-
                     selected.enter()
                         .insert('svg:line', 'path')
                             .attr('class', 'selected')
-                            .attr('stroke', 'white')
-                            .attr('stroke-width', '8px')
-                            .attr('x1', function(d){return x(original) + ph})
-                            .attr('x2', function(d){return x(original) + ph})
+                            .attr('stroke', 'black')
+                            .attr('stroke-width', '0.5px')
+                            .attr('x1', function(d){return x(original)})
+                            .attr('x2', function(d){return x(original)})
                             .attr("y1", 0)
-                            .attr("y2", h)
+                            .attr("y2", dh + 10)
                             .transition().duration(300)
-                                .attr('x1', function(d, i, b){return x(d) + ph})
-                                .attr('x2', function(d, i, b){return x(d) + ph})
+                                .attr('x1', function(d, i, b){return x(d)})
+                                .attr('x2', function(d, i, b){return x(d)})
                     
                     selected.exit().remove();
+
+                    var index = data.binarySearch(selected_date, function(a, b){
+                        return a.date.getTime() - b.getTime()
+                    });
                     
-                    var selected_date = new Date(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0);
-                    var selected_record = false;
-                    for(var i = 0; i<data.length;i++){
-                        if(data[i].date.getTime() == selected_date.getTime()){
-                            selected_record = data[i];
-                            break;                            
-                        }
-                    }
+                    var selected_record = data[index];
+
                     selectedDaily.pop();             
                     if(selected_record){
                         if(!a){
                             selectedDaily.push(selected_record);
                         }
                     }
-                    var dailypin = vis.selectAll('circle.dailypin')
+                    var dailypin = g.selectAll('circle.dailypin')
                         .data(selectedDaily, function(d){return d.date.getTime()})
                     
                     dailypin.enter()
@@ -243,28 +302,52 @@
                             .attr('class', 'dailypin')
                             .attr('stroke', 'black')
                             .attr('stroke-width', 0.5)
-                            .attr('cx', function(d){return x(d.date) + ph;})
+                            .attr('cx', function(d){return x(d.date);})
                             .attr('cy', function(d){return y(d.celsius);})
                             .attr('r', 2)
                             .attr('fill', '#CCC')
                             
                     dailypin.exit().remove();
                     
+                    var daylabel = vis.selectAll('text.daylabel')
+                        .data(selectedDaily, function(d){return d.date.getTime()});
+                    daylabel.enter()
+                        .append('svg:text')
+                            .attr('class', 'daylabel')
+                            .text(function(d){return d.date.toDateString()})
+                            .attr('x', w - pr)
+                            .attr('y', h - 5)
+                            .attr("text-anchor", "end")
+                            .attr('style', 'font-size: 0.7em;')
+        			        
+                            
+                        
+                    daylabel.exit().remove()
+                    
                     var selected_month = new Date(date.getFullYear(), date.getMonth(), 1, 1, 1, 1);
-                    var selected_month_record = false;
-                    for(var i = 0; i<monthly.length;i++){
-                        if(monthly[i].date.getTime() == selected_month.getTime()){
-                            selected_month_record = monthly[i];
-                            break;             
-                        }
+                    if(selected_date.getDate() > 15){
+                        selected_month.setMonth(selected_month.getMonth() + 1);
                     }
+                    
+                    var index = monthly.binarySearch(selected_month, function(a, b){
+                        return a.date.getTime() - b.getTime()
+                    });
+                    
+                    var selected_month_record = monthly[index];
+                    // var selected_month_record = false;
+                    // for(var i = 0; i<monthly.length;i++){
+                    //     if(monthly[i].date.getTime() == selected_month.getTime()){
+                    //         selected_month_record = monthly[i];
+                    //         break;             
+                    //     }
+                    // }
                     selectedMonthly.pop();             
                     if(selected_month_record){
                         if(!a){
                             selectedMonthly.push(selected_month_record);
                         }
                     }
-                    var monthlypin = vis.selectAll('circle.monthly')
+                    var monthlypin = g.selectAll('circle.monthly')
                         .data(selectedMonthly, function(d){return d.date.getTime()})
                     
                     monthlypin.enter()
@@ -272,23 +355,22 @@
                             .attr('class', 'monthly')
                             .attr('stroke', 'black')
                             .attr('stroke-width', 0.5)
-                            .attr('cx', function(d){return x(d.date) + ph;})
+                            .attr('cx', function(d){return x(d.date);})
                             .attr('cy', function(d){return y(d.celsius);})
                             .attr('r', 2)
                             .attr('fill', '#004080')
-
+                    
                     monthlypin.exit().remove();
                     
-                    
                     if(!a){
-                        vis.select('#monthly_legend')
+                        vis.select('text.monthly_legend')
                             .text(selected_month_record ? Math.round(selected_month_record.celsius * 100) / 100 + ' monthly avg' : '● monthly avg')
-                        vis.select('#daily_legend')
+                        vis.select('text.daily_legend')
                             .text(selected_record ? Math.round(selected_record.celsius * 100) / 100 + ' daily avg' : '● daily avg')
                     }else{
-                        vis.select('#monthly_legend')
+                        vis.select('text.monthly_legend')
                             .text('● monthly avg')                        
-                        vis.select('#daily_legend')
+                        vis.select('text.daily_legend')
                             .text('● daily avg')                        
                     }
                 }, 5);
