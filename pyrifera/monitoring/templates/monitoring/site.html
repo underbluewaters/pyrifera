@@ -84,13 +84,17 @@
                 earliest = d3.min(data, function(d){return d.date}),
                 latest = d3.max(data, function(d){return d.date}),
                 pv = 25,
-                ph = 10,
+                ph = 20,
                 x = d3.scale.linear().domain([earliest, latest]).range([0, w]),
                 y = d3.scale.linear().domain([min, max]).range([h, 0])
                 daily_color = "#B7C5CD",
                 monthly_color = "#2A4AAF";
-                
-            var years = [new Date(earliest.getFullYear(), 1, 1, 1, 1, 1)];
+            console.log(latest);
+			console.log(earliest);
+            var years = [];
+			if(earliest.getDay() == 1 && earliest.getMonth() == 1){
+				years.push([new Date(earliest.getFullYear(), 1, 1, 1, 1, 1)]);				
+			}
             var c = earliest;
             while(c.getFullYear() < latest.getFullYear()){
                 c = new Date(c.getFullYear() + 1, 1, 1, 1, 1, 1);
@@ -105,14 +109,14 @@
                     .attr('height', h + pv * 2)
                     .on("mousemove", update)
                     .on('mouseout', function(){update(true)})
-                    .append("svg:g")
-                      .attr("transform", "translate(" + ph + "," + pv + ")");
+                    // .append("svg:g")
+                    //   .attr("transform", "translate(" + ph + "," + pv + ")");
             
             vis.selectAll("svg:path")
                 .data([data]).enter()
                 .append('svg:path')
               .attr("d", d3.svg.line()
-                .x(function(d) { return x(d.date); })
+                .x(function(d) { return x(d.date) + ph; })
                 .y(function(d) { return y(d.celsius)}))
               .attr('style', 'stroke: '+daily_color+';')
               .attr('class','line')
@@ -121,7 +125,7 @@
                   .data([monthly]).enter()
                   .append('svg:path')
                 .attr("d", d3.svg.line()
-                  .x(function(d) { return x(d.date); })
+                  .x(function(d) { return x(d.date) + ph; })
                   .y(function(d) { return y(d.celsius)})
                   .interpolate('cardinal')
                   .tension(0.65))
@@ -131,7 +135,7 @@
             var daily_label = vis.append("svg:text")
                 .attr('id', 'daily_legend')
                 .attr("y", 0)
-                .attr("x", w - 110)
+                .attr("x", (w) - 110)
                 .attr("fill", daily_color)
                 .attr("text-anchor", "end")
                 .text('● daily avg')
@@ -147,18 +151,41 @@
                 .attr('style', 'font-size: 0.8em;')
                 .attr('opacity', '0.8')
             
-            var year_labels = vis.selectAll('text.year_label')
+            
+			var max_year_labels = (w + ph * 2) / (21 + 25);
+			
+
+			var year_labels = vis.selectAll('text.year_label')
                 .data(years).enter()
                 .append('svg:text')
                 .text(function(d){return d.getFullYear()})
-                .attr('x', function(d){return x(d)})
-                .attr('y', h + 14)
-                .attr('style', 'font-size: 0.6em;')
+                .attr('x', function(d){return x(d) + ph})
+                .attr('y', h + 24)
+				.attr('opacity', function(d, i){ return i % Math.round(years.length / max_year_labels) ? '0' : '1'})
+                .attr('style', 'font-size: 0.7em;text-anchor:middle;')
+
+            var year_tics = vis.selectAll('line.year')
+                .data(years).enter()
+                .append('svg:line')
+                .attr('x1', function(d){return x(d) + ph})
+                .attr('y1', h + 10)
+                .attr('x2', function(d){return x(d) + ph})
+                .attr('y2', h + 5)
+				.attr('style', 'stroke:black;stroke-width:1;')
+
+            var month_tics = vis.selectAll('line.month')
+                .data(monthly).enter()
+                .append('svg:line')
+                .attr('x1', function(d){return x(d.date) + ph})
+                .attr('y1', h + 8)
+                .attr('x2', function(d){return x(d.date) + ph})
+                .attr('y2', h + 7)
+				.attr('style', 'stroke:black;stroke-width:0.5;')
             
             var selectedData = [];
             var selectedDaily = [];
             var selectedMonthly = [];
-            var uscale = (latest.getTime() - earliest.getTime()) / w;
+            var uscale = (latest.getTime() - earliest.getTime()) / w + ph * 2;
             var timeout;
             var date = null;
             function update(a) {
@@ -182,15 +209,15 @@
                     selected.enter()
                         .insert('svg:line', 'path')
                             .attr('class', 'selected')
-                            .attr('stroke', '#FFF2BA')
+                            .attr('stroke', 'white')
                             .attr('stroke-width', '8px')
-                            .attr('x1', function(d){return x(original)})
-                            .attr('x2', function(d){return x(original)})
+                            .attr('x1', function(d){return x(original) + ph})
+                            .attr('x2', function(d){return x(original) + ph})
                             .attr("y1", 0)
                             .attr("y2", h)
                             .transition().duration(300)
-                                .attr('x1', function(d, i, b){return x(d)})
-                                .attr('x2', function(d, i, b){return x(d)})
+                                .attr('x1', function(d, i, b){return x(d) + ph})
+                                .attr('x2', function(d, i, b){return x(d) + ph})
                     
                     selected.exit().remove();
                     
@@ -216,7 +243,7 @@
                             .attr('class', 'dailypin')
                             .attr('stroke', 'black')
                             .attr('stroke-width', 0.5)
-                            .attr('cx', function(d){return x(d.date);})
+                            .attr('cx', function(d){return x(d.date) + ph;})
                             .attr('cy', function(d){return y(d.celsius);})
                             .attr('r', 2)
                             .attr('fill', '#CCC')
@@ -245,7 +272,7 @@
                             .attr('class', 'monthly')
                             .attr('stroke', 'black')
                             .attr('stroke-width', 0.5)
-                            .attr('cx', function(d){return x(d.date);})
+                            .attr('cx', function(d){return x(d.date) + ph;})
                             .attr('cy', function(d){return y(d.celsius);})
                             .attr('r', 2)
                             .attr('fill', '#004080')
