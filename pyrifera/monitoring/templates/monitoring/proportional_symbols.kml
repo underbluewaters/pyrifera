@@ -51,6 +51,9 @@
               <colorMode>normal</colorMode>
               <scale>0</scale>
             </LabelStyle>
+            <BalloonStyle>
+                <text>$[description]</text>
+            </BalloonStyle>
     	</Style>
     	<Style id="scaledImageHover">
     		<IconStyle>
@@ -63,6 +66,9 @@
               <colorMode>normal</colorMode>
               <scale>1</scale>
             </LabelStyle>
+            <BalloonStyle>
+                <text>$[description]</text>
+            </BalloonStyle>
     	</Style>
     	<StyleMap id="scaledImage">
     	   <Pair>

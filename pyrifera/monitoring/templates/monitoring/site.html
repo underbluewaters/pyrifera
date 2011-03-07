@@ -136,7 +136,7 @@
                 .attr('class', 'daily_legend')
                 .attr("y", pt + 10)
                 .attr("x", (w) - (110 + pr))
-                .attr("fill", daily_color)
+                .attr("fill", 'grey')
                 .attr("text-anchor", "end")
                 .text('● daily avg')
                 .attr('style', 'font-size: 0.8em;')
@@ -270,8 +270,9 @@
                     selected.enter()
                         .insert('svg:line', 'path')
                             .attr('class', 'selected')
-                            .attr('stroke', 'black')
+                            .attr('stroke', 'grey')
                             .attr('stroke-width', '0.5px')
+                            .attr('style', 'stroke-dasharray: 3, 3;')
                             .attr('x1', function(d){return x(original)})
                             .attr('x2', function(d){return x(original)})
                             .attr("y1", 0)
@@ -318,7 +319,7 @@
                             .attr('x', w - pr)
                             .attr('y', h - 5)
                             .attr("text-anchor", "end")
-                            .attr('style', 'font-size: 0.7em;')
+                            .attr('style', 'font-size: 0.7em; fill:grey;')
         			        
                             
                         

@@ -93,6 +93,13 @@
                     </Folder>
                 </Folder>
             {% endfor %}
+            <NetworkLink>
+                <name>Marine Protected Areas</name>
+                <visibility>1</visibility>
+                <Link>
+                    <href>http://marinemap.org/marinemap/kml/array/964/</href>
+                </Link>
+            </NetworkLink>
         </Folder>
     </Document>
 </kml>

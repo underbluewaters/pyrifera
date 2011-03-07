@@ -236,6 +236,9 @@ class MeanDensity(models.Model):
     def __unicode__(self):
         return "%d %s %s %s: %d %s" % (self.year, self.site.name, 
         self.protocol.name, self.taxon, self.mean, self.protocol.unit)
+    
+    def json_string(self):
+        return ("{date: new Date(%s, 6, 1), mean: %s, stderror: %s, n: %s}" % (self.year, self.mean, self.stderror, self.n)).replace('None', 'null')
 
 def records_to_json(queryset):
     results = []
