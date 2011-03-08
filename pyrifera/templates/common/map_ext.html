@@ -1,4 +1,5 @@
 {% extends "common/map-viewer-only.html" %}
+{% load absurl %}
 {% block headtwo %}
     <script type="text/javascript" src="{{MEDIA_URL}}d3.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}stream.js"></script>
@@ -61,24 +62,59 @@
 
 {% block tabscontents %}
     <div id="Monitoring">
-        <p><input style="float:left;margin-right:1em;width:50%;padding-top:6px;" type="text" name="search" value="species name" id="search"><a id="speciessearch" href="#" class="button"><span>Search</span></a></p><br style="clear:both;" />
-        <div id="sites_tree"></div>
+        <p>Introduction Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        {% for project in projects.all %}
+            <h2>{{project.name}}</h2>
+            <ul class="project_list">
+                <li><a href="{% url monitoring.views.search project.pk %}" rel="sidebar">Search or Browse Species Data</a></li>
+                <li>
+                    <div class="tree" data-sites-url="{% absurl monitoring.views.sites_nl project.pk %}" id="{{project.pk}}"></div>
+                </li>
+            </ul>
+        {% endfor %}
+        <!-- <p><input style="float:left;margin-right:1em;width:50%;padding-top:6px;" type="text" name="search" value="species name" id="search"><a id="speciessearch" href="#" class="button"><span>Search</span></a></p><br style="clear:both;" />
+        <div id="sites_tree"></div> -->
     </div>
 {% endblock tabscontents %}
 
 {% block layersConfig %}
+    
     // setup which kml files are shown in the data layers panel
     lingcod.addLayer('{% url public-data-layers %}');
+
+    var search_panel;
+
     $(lingcod).bind('earthReady', function(e, ge, gex){
-        var sites_tree = kmltree({
-            url: '/projects/',
-            gex: gex, 
-            mapElement: $('#map3d'), 
-            element: $('#sites_tree'),
-            bustCache: true,
-            setExtent: false,
-            displayEnhancedContent: true
+        $('#panel-holder').prepend('<div id="spc">');
+
+        search_panel = lingcod.panel({appendTo: $('#spc'), 
+            showCloseButton: false});
+        
+        $('#search_panel a.close').live('click', function(e){
+            search_panel.hide();
+            e.preventDefault();
         });
-        sites_tree.load();
+            
+        $('.project_list').each(function(){
+            var tree_el = $(this).find('.tree');
+            var tree = kmltree({
+                url: tree_el.data('sites-url'),
+                gex: gex,
+                mapElement: $('#map3d'),
+                element: tree_el,
+                bustCache: true,
+                setExtent: true,
+                displayEnhancedContent: true,
+                supportItemIcon: true
+            });
+            tree.load();
+        });
+    });
+    
+    $('.project_list a[rel=sidebar]').live('click', function(e){
+        var href = $(this).attr('href');
+        console.log(href);
+        e.preventDefault();
+        search_panel.showUrl(href, {});
     });
 {% endblock layersConfig %}

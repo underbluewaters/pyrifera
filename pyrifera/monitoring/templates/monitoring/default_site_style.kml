@@ -12,6 +12,10 @@
 		<scale>0</scale>
 	</LabelStyle>
 	<ListStyle>
+	    <ItemIcon>
+          <state>open closed</state>
+          <href>http://chart.apis.google.com/chart?chst=d_map_pin_letter&amp;chld=|{% block colorThree %}ffffff{% endblock colorThree %}</href>
+        </ItemIcon>
 	</ListStyle>
 	<BalloonStyle>
         {% block balloonStyle %}

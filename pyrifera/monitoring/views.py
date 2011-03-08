@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 import json
 from symbolizers import ColladaSymbolizer, ScaledImageSymbolizer
+from settings import MEDIA_URL
 
 def projects(request):
     """Renders a kml file representing projects."""
@@ -11,6 +12,33 @@ def projects(request):
     return render_to_response('monitoring/projects.kml', {
             "projects": projects
         }, mimetype="application/vnd.google-earth.kml+xml")
+        
+def sites(request, project_pk):
+    """Renders a kml file with all sites for a given project."""
+    project = get_object_or_404(Project, pk=project_pk)
+    return render_to_response('monitoring/sites.kml', {
+        'project': project,
+    }, mimetype="application/vnd.google-earth.kml+xml")
+
+def sites_nl(request, project_pk):
+    """Renders an empty networklink pointed at monitoring.views.sites."""
+    project = get_object_or_404(Project, pk=project_pk)
+    return render_to_response('monitoring/sites_nl.kml', {
+        'project': project,
+    }, mimetype="application/vnd.google-earth.kml+xml")
+
+def search(request, project_pk):
+    """
+    Renders a search box that can be added to the sidebar for selecting taxa. 
+    """
+    project = get_object_or_404(Project, pk=project_pk)
+    offset = int(request.GET.get('offset', 0))
+    return render_to_response('monitoring/search.html', {
+        'project': project,
+        'MEDIA_URL': MEDIA_URL,
+        'taxa': project.taxa()[offset:int(offset)+20]
+    })
+    
             
 def streamgraph(request, site_pk, protocol_pk):
     """Renders a kml file representing sites."""

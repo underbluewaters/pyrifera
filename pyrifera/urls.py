@@ -1,13 +1,15 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
 from django.contrib import admin
+from monitoring.models import Project
+
 import monitoring
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    url(r'^$', 'lingcod.common.views.map', {'template_name': 'common/map_ext.html'}, name="map"),
+    url(r'^$', 'lingcod.common.views.map', {'template_name': 'common/map_ext.html', 'extra_context': {'projects': Project.objects}}, name="map"),
     (r'^tests/', 'django.views.generic.simple.direct_to_template', {'template': 'common/tests.html', 'extra_context': {'api_key': settings.GOOGLE_API_KEY}}),
     (r'^', include('monitoring.urls')),
     (r'^', include('lingcod.common.urls')),

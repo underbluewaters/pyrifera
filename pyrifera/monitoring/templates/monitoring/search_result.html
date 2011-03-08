@@ -1,0 +1,8 @@
+<li id="taxon_{{taxon.pk}}">
+    <h3>{{taxon.name}}</h3>
+    {% ifequal taxon.protocols.count 1 %}
+    <p>This taxon is sampled by the {% for protocol in taxon.protocols %}<a href="#">{{protocol.name|lower}}</a>{% endfor %} protocol</p>
+    {% else %}
+    <p>This taxon is sampled in multiple protocols: {% for protocol in taxon.protocols %}<a href="#">{{protocol.name}}</a>, {% endfor %}</p>
+    {% endifequal %}
+</li>
