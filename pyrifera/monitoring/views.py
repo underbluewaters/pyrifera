@@ -5,6 +5,9 @@ from django.template import RequestContext
 import json
 from symbolizers import ColladaSymbolizer, ScaledImageSymbolizer
 from settings import MEDIA_URL
+import operator
+from haystack.query import SearchQuerySet, SQ
+from django.http import HttpResponse
 
 def projects(request):
     """Renders a kml file representing projects."""
@@ -19,6 +22,15 @@ def sites(request, project_pk):
     return render_to_response('monitoring/sites.kml', {
         'project': project,
     }, mimetype="application/vnd.google-earth.kml+xml")
+
+def json_search(request):
+    """Returns an array of matching terms"""
+    from django.utils.safestring import mark_safe
+    query = request.GET.get('q', '')
+    results = SearchQuerySet().filter(reduce(operator.__and__, [SQ(text__startswith=word.strip()) | SQ(text__icontains=word.strip()) | SQ(text=word.strip()) for word in query.split(' ')]))
+    results = results[0:10]
+    return HttpResponse(mark_safe('\n'.join([str(r.text.strip()) for r in results])), mimetype="text/plain")
+    # return HttpResponse(json.dumps({'query': query, 'suggestions':[r.text for r in results]}), mimetype='application/json')
 
 def sites_nl(request, project_pk):
     """Renders an empty networklink pointed at monitoring.views.sites."""

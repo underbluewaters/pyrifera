@@ -91,25 +91,47 @@
         padding:0;
         background-color:white;
     }
+    
+    #autocomplete {
+        position:absolute;
+        background-color:white;
+        top:60px;
+        left:0px;
+        width:80%;
+        text-indent:none;
+        margin:0px;
+        padding:5px;
+    }
+    
+    .acResults {
+        z-index:10000;
+    }
 
 </style>
 <script type="text/javascript" charset="utf-8">
     function rsList(){
-        console.log('rsList');
+        console.log('rslist');
         var ph = $('#search_panel').parent().parent().parent().height();
         var sph = $('#search_panel').height();
         var sfh = $('#search_footer').height();
-        console.log(ph - sph - sfh);
         $('#search_list').height(ph - sph - sfh - 21);
-        console.log('done', $('#search_list').height());
     }
 
     lingcod.onShow(function(){
         $('#search_panel input').focus();
         $('#search_panel').parent().parent().parent().css('overflow', 'hidden');
-        $(window).bind(rsList);
+        $(window).bind('resize', rsList);
         rsList();
-        $('a.close img').attr('src') 
+        $('a.close img').attr('src');
+        {% load absurl %}
+        var base_url = "{% absurl monitoring.views.json_search %}";
+        console.log(base_url);
+        $('#query').autocomplete({
+            url: base_url,
+            delay: 50,
+            matchSubset: false,
+            autoFill: false
+        });
     });
     
     lingcod.onHide(function(){
@@ -119,7 +141,9 @@
 <div id="search_panel" style="">
     <a class="close" href="#"><img src="{{MEDIA_URL}}common/images/close.png" /></a>
     <h3>Species Data - {{project.name}}</h3>
-    <input type="text" />
+    <form>
+        <input type="text" id='query' autocomplete="off" />
+    </form>
     <a class="button"><span>Search</span></a>
     <br style="clear:both;" />
     <p>You can search for species by scientific or common name.</p>

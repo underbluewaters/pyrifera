@@ -76,7 +76,7 @@ class SamplingSite(models.Model):
     name = models.CharField(max_length=100)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-    project = models.ForeignKey(Project, related_name='sites')
+    project = models.ForeignKey(Project, db_index=True, related_name='sites')
     description = models.TextField(blank=True)
     point = models.PointField(geography=True)
     code = models.CharField(max_length=100, blank=True)
@@ -135,8 +135,8 @@ class Taxon(models.Model):
     """
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-    common_name = models.CharField(max_length=200, blank=True)
-    genus = models.CharField(max_length=200, blank=True)
+    common_name = models.CharField(db_index=True, max_length=200, blank=True)
+    genus = models.CharField(db_index=True, max_length=200, blank=True)
     species = models.CharField(max_length=200, blank=True)
     scientific_name = models.CharField(max_length=200, blank=True)
     code = models.CharField(max_length=100, blank=True)
@@ -220,13 +220,13 @@ class MeanDensity(models.Model):
     protocol.
     
     """
-    protocol = models.ForeignKey('Protocol', blank=False, 
+    protocol = models.ForeignKey('Protocol', db_index=True, blank=False, 
         related_name="mean_densities")
     site = models.ForeignKey('SamplingSite', blank=False, 
         related_name="mean_densities")
-    taxon = models.ForeignKey('Taxon', blank=False,
+    taxon = models.ForeignKey('Taxon', db_index=True, blank=False,
         related_name="mean_densities")
-    year = models.IntegerField(blank=False)
+    year = models.IntegerField(db_index=True, blank=False)
     month = models.IntegerField(blank=True, null=True)
     day = models.IntegerField(blank=True, null=True)
     mean = models.FloatField(blank=False)
@@ -296,5 +296,5 @@ class WaterTemperature(models.Model):
     in degrees celsius.
     """
     site = models.ForeignKey('SamplingSite', blank=False)
-    date = models.DateTimeField(blank=False)
+    date = models.DateTimeField(db_index=True, blank=False)
     celsius = models.DecimalField(blank=False, max_digits=5, decimal_places=3)

@@ -1,8 +1,10 @@
 <li id="taxon_{{taxon.pk}}">
+    <a style="float:left;" href="http://www.arkive.org/lace-coral/stylaster-californicus/#src=portletV3web" title="ARKive species - Lace coral (Stylaster californicus)" ><img src="http://cdn2.arkive.org/media/CA/CADFC6B8-8F2C-4588-9819-4D5DA2DEE6D6/Presentation.Portlet/Lace-coral-Stylaster-californicus.jpg" alt="ARKive species - Lace coral (Stylaster californicus)" title="ARKive species - Lace coral (Stylaster californicus)" border="0"></a>
     <h3>{{taxon.name}}</h3>
     {% ifequal taxon.protocols.count 1 %}
     <p>This taxon is sampled by the {% for protocol in taxon.protocols %}<a href="#">{{protocol.name|lower}}</a>{% endfor %} protocol</p>
     {% else %}
     <p>This taxon is sampled in multiple protocols: {% for protocol in taxon.protocols %}<a href="#">{{protocol.name}}</a>, {% endfor %}</p>
     {% endifequal %}
+    <br style="clear: both;">
 </li>

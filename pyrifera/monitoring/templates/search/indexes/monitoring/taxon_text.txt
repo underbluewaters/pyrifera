@@ -1,0 +1,5 @@
+{{object.common_name}}
+{{object.scientific_name}}
+{{object.genus}}
+{{object.species}}
+{{object.code}}
