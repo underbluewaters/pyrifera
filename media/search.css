@@ -181,3 +181,14 @@ div.gs-visibleUrl {
     float:left;
     margin-left:10px;
 }
+
+#nowShowing {
+    text-indent: 20px;
+    margin-top:5px;
+}
+
+#nowShowing a img {
+    border:none;
+    margin-bottom:-3px;
+    margin-right:5px;
+}

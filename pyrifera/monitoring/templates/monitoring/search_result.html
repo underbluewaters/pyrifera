@@ -1,9 +1,12 @@
+{% load absurl %}
 <li class="taxon_result" id="taxon_{{object.pk}}">
     <div class="image_results" data-search-term="{{object.image_search_term}}"></div>
     <h3>{{object.name}}<span class="common_name">{{object.common_name}}</span></h3>
     {% ifequal object.protocols.count 1 %}
     <p>This species is sampled by the {% for protocol in object.protocols %}<a class="protocol" href="#">{{protocol.name|lower}}</a>{% endfor %} protocol.</p>
-    <p><a href="#" class="view_data">View Data →</a></p>
+    {% for protocol in object.protocols %}
+    <p><a type="application/vnd.google-earth.kml+xml" href="{% absurl monitoring.views.proportional_symbols object.pk protocol.pk %}" class="view_data" title="{{object.name}} {{protocol.name}} data">View Data →</a></p>
+    {% endfor %}
     {% else %}
         {% ifequal object.protocols.count 0 %}
         <p>No data currently available for this species.</p>

@@ -1,5 +1,8 @@
 from settings import MEDIA_URL
 from models import MeanDensity
+from django.contrib.gis.geos import GeometryCollection, MultiPoint, Point
+from django.contrib.gis.measure import Distance, D
+from math import pi, sin, tan, sqrt, pow
 
 class ColladaSymbolizer:
     
@@ -26,12 +29,8 @@ class ColladaSymbolizer:
             site = record.site
             taxon = record.taxon
             ratio = record.mean / max
-            print ratio
-            print record.mean
             scale = self.minScale + ((self.maxScale - self.minScale) * ratio)
             z = self.max_z - ((self.maxScale - self.minScale) * (ratio))
-            print "z", z
-            print scale
             model = MEDIA_URL + "prop_circle_zero.dae"
             if record.mean > 0:
                 model = MEDIA_URL + "prop_circle.dae"
@@ -111,11 +110,23 @@ class ScaledImageSymbolizer:
         self.minScale = minScale
         self.maxScale = maxScale
 
+    def lookat(self):
+        dataset = list(self.dataset)
+        latest = None
+        for record in dataset:
+            if latest is None or record.year > latest:
+                latest = record.year
+        mp = MultiPoint([r.site.point for r in list(self.dataset)])
+        timestamp = str(latest) + "-12-31"
+        kml = calclookat(mp.envelope, timestamp)
+        return kml
+
     @property
     def placemarks(self):
         min = None
         max = None
-        dataset = list(self.dataset)
+        self.dataset = list(self.dataset)
+        dataset = self.dataset
         for record in dataset:
             if min is None or record.mean < min:
                 min = record.mean
@@ -126,10 +137,7 @@ class ScaledImageSymbolizer:
             site = record.site
             taxon = record.taxon
             ratio = record.mean / max
-            print ratio
-            print record.mean
             scale = self.minScale + ((self.maxScale - self.minScale) * ratio)
-            print scale
             data = ", ".join([m.json_string() for m in MeanDensity.objects.filter(site=site, taxon=taxon).order_by('year')])            
             image = MEDIA_URL + "images/prop_circle.png"
             if record.mean > 0:
@@ -320,3 +328,55 @@ class ScaledImageSymbolizer:
                 site.point.kml,
             ))
         return marks
+
+
+def toRadians(n):
+    return n * pi / 180
+
+EARTH_RADIUS = 6378135.0
+DEFAULT_RANGE = 1000;
+
+def calclookat(geom, timestamp):
+    geom = geom.clone()
+    geom.transform(4326)
+    center = geom.centroid;
+    extent = geom.extent
+    w = extent[0]
+    s = extent[1]
+    e = extent[2]
+    n = extent[3]
+    
+    if w == e and n == s:
+        w = w + 1
+        n = n + 1
+
+    distEW = (Point(center.x, w)).distance(Point(center.x, e))
+    distNS = (Point(n, center.y)).distance(Point(s, center.y))
+
+    aspectRatio = min(max(1.0, distEW / distNS), 1.0)
+
+    alpha = toRadians((45.0 / (aspectRatio + 0.4) - 2.0))
+    expandToDistance = max(distNS, distEW)
+    beta = min(toRadians(90), alpha + expandToDistance / (2 * EARTH_RADIUS))
+    lookAtRange = 1.5 * EARTH_RADIUS * (sin(beta) * sqrt(1 + 1 / pow(tan(alpha), 2)) - 1)
+
+    meters = lookAtRange * 111.12 * 1000
+
+    time = ''
+    if timestamp:
+        time = """
+            <gx:TimeStamp>
+                <when>%s</when>
+            </gx:TimeStamp>
+        """ % timestamp
+    return """
+        <LookAt>
+            <latitude>%f</latitude>
+            <longitude>%f</longitude>
+            <range>%f</range>
+            <tilt>%f</tilt>
+            <heading>%f</heading>
+            <altitudeMode>clampToGround</altitudeMode>
+            %s
+        </LookAt>
+    """ % (center.y, center.x, meters, 0, 0, time, )

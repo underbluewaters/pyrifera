@@ -131,6 +131,7 @@ def proportional_symbols(request, pk, protocol_pk):
         'year').select_related('site')
     symbolizer = ColladaSymbolizer(observations)
     symbolizer = ScaledImageSymbolizer(observations)
+    sites = taxon.project.sites.all()
     return render_to_response('monitoring/proportional_symbols.kml', {
             "taxon": taxon,
             "protocol": protocol,

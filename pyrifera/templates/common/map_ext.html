@@ -93,6 +93,8 @@
                 e.preventDefault();
                 onTaxonSubmit(cOffset - 10 || 0);
             });
+            
+            $('#search_list a.view_data').live('click', handleDataLinkClick);
 
             // el.autocomplete({
             //     url: base_url,
@@ -116,6 +118,13 @@
             search.setSearchCompleteCallback(this, searchComplete, null);
             search.setResultSetSize(1);
             search.setRestriction(google.search.ImageSearch.RESTRICT_RIGHTS, google.search.ImageSearch.RIGHTS_REUSE);
+            $('#nowShowing a img').live('click', function(){
+                clearPData();
+                var sites_li = $('li.kmltree-item:first')
+                if(!sites_li.hasClass('visible')){
+                    sites_li.find('.toggler').click();                
+                }
+            });
         });
                         
         function loadImages(container){
@@ -163,7 +172,44 @@
         
         
         
-        // 
+        // Begin "View Data" link handling section
+        function handleDataLinkClick(e){
+            e.preventDefault();
+            var a = $(this);
+            var href = a.attr('href');
+            loadPData(href, a.attr('title'));
+        }
+        
+        var currentNl;
+        
+        function loadPData(href, title){
+            var sites_li = $('li.kmltree-item:first')
+            if(sites_li.hasClass('visible')){
+                sites_li.find('.toggler').click();                
+            }
+            if(currentNl){
+                clearPData();
+            }
+            var link = ge.createLink('');
+            link.setHref(href);
+
+            var networkLink = ge.createNetworkLink('');
+            networkLink.set(link, true, true); // Sets the link, refreshVisibility, and flyToView
+
+            ge.getFeatures().appendChild(networkLink);
+            currentNl = networkLink;
+            $('#nowShowing').html('<a href="#"><img src="{{MEDIA_URL}}common/images/close.png"></a>Now showing '+title);
+            $('#nowShowing').show();
+        }
+        
+        function clearPData(){
+            $('#nowShowing').hide();
+            $('#nowShowing').html('');
+            if(currentNl){
+                ge.getFeatures().removeChild(currentNl);
+                currentNl = null;
+            }
+        }
         
     </script>
     <style id="videostyle" type="text/css" media="screen">
@@ -229,6 +275,7 @@
             <h2>{{project.name}}</h2>
             <ul class="project_list">
                 <li><a href="{% url monitoring.views.search project.pk %}" rel="sidebar">Search or Browse Species Data</a></li>
+                <li id="nowShowing" style="display:none;"></li>
                 <li>
                     <div class="tree" data-sites-url="{% absurl monitoring.views.sites_nl project.pk %}" id="{{project.pk}}"></div>
                 </li>

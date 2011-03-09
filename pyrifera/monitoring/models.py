@@ -179,7 +179,7 @@ class Taxon(models.Model):
             name = re.split('(?i)\W'+excluded.affix.replace('.', '\\.') + '\W', name)[0]
             name = re.split('(?i)\W'+excluded.affix.replace('.', '\\.') + '$', name)[0]
         for excluded in ExcludedSearchTerm.objects.all():
-            name = name.replace(excluded.term, '')
+            name = name.replace(excluded.term.replace('.', '\\.'), '')
         return name.strip()
 
 

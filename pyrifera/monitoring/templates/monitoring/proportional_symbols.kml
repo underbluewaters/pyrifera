@@ -2,6 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2" 
     xmlns:gx="http://www.google.com/kml/ext/2.2">
     <Document>
+        {{symbolizer.lookat|safe}}
     	<Style id="sn_ylw-pushpin">
     		<IconStyle>
     			<color>01000000</color>
