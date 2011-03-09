@@ -5,7 +5,7 @@
     lingcod.onShow(function(){
         $('#search_panel input').focus();
         $('#search_panel').parent().parent().parent().css('overflow', 'hidden');
-        $(window).bind('resize', rsList);
+        $(window).bind('resize', $.debounce(500, rsList));
         rsList();
         $('a.close img').attr('src');
         setupAutocomplete($('#query'));

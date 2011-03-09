@@ -18,7 +18,7 @@
             var ph = $('#search_panel').parent().parent().parent().height();
             var sph = $('#search_panel').height();
             var sfh = $('#search_footer').height();
-            $('#search_list').height(ph - sph - sfh - 21);
+            $('#search_list').height(ph - sph - sfh - 31);
         }
         
         var req;
@@ -27,7 +27,6 @@
         var cOffset = 0;
         
         function onTaxonSubmit(offset){
-            console.log('onTaxonSubmit', offset);
             if(req && req.abort){
                 req.abort();
             }
@@ -51,7 +50,6 @@
             $('span.count').html(data['count']);
             $('span.offset').html(data['offset']);
             $('span.offset2').html(data['offset2']);
-            console.log('a.nav.back', $('a.nav.back'));
             $('a.nav.back').toggleClass('disabled', data['offset'] === 0);
             $('a.nav.forward').toggleClass('disabled', data['offset2'] >= data['count']);
             $('#search_list ul').html(data['results'].join('\n'));
@@ -76,14 +74,12 @@
             
                         
             var parent = el.parent().parent().parent();
-            console.log(parent);
             parent.find('a.forward').click(function(e){
                 if($(this).hasClass('disabled')){
                     return;
                 }
                 e.preventDefault();
                 var offset = (cOffset || 0) + 10;
-                console.log('forward', offset);
                 onTaxonSubmit(offset);
             });
 
@@ -161,6 +157,10 @@
                 loadNext();
             }
         }
+        
+        
+        
+        // 
         
     </script>
     <style id="videostyle" type="text/css" media="screen">
