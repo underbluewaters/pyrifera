@@ -23,7 +23,7 @@ def sites(request, project_pk):
         'project': project,
     }, mimetype="application/vnd.google-earth.kml+xml")
 
-def json_search(request):
+def autocomplete(request):
     """Returns an array of matching terms"""
     from django.utils.safestring import mark_safe
     query = request.GET.get('q', '')
@@ -31,6 +31,31 @@ def json_search(request):
     results = results[0:10]
     return HttpResponse(mark_safe('\n'.join([str(r.text.strip()) for r in results])), mimetype="text/plain")
     # return HttpResponse(json.dumps({'query': query, 'suggestions':[r.text for r in results]}), mimetype='application/json')
+
+
+def autocomplete2(request):
+    """Returns the number of matches, offsets, and html representations of 
+    the result set.
+    """
+    from django.utils.safestring import mark_safe
+    query = request.GET.get('q', '')
+    offset = int(request.GET.get('offset', 0));
+    count = int(request.GET.get('count', 10));
+    results = SearchQuerySet().filter(reduce(operator.__and__, [SQ(text__startswith=word.strip()) | SQ(text__icontains=word.strip()) | SQ(text=word.strip()) for word in query.split(' ')])).order_by('name')
+    n = results.count()
+    if n < count:
+        offset2 = offset + n
+    else:
+        offset2 = offset + count
+    results = results[offset:offset2]
+    return HttpResponse(json.dumps({
+        'count': n,
+        'offset': offset,
+        'offset2': offset2,
+        'results': [ r.html for r in results ],
+    }), mimetype="text/json")
+    
+
 
 def sites_nl(request, project_pk):
     """Renders an empty networklink pointed at monitoring.views.sites."""
@@ -48,7 +73,10 @@ def search(request, project_pk):
     return render_to_response('monitoring/search.html', {
         'project': project,
         'MEDIA_URL': MEDIA_URL,
-        'taxa': project.taxa()[offset:int(offset)+20]
+        'taxa': project.taxa()[offset:int(offset)+10],
+        'offset': offset,
+        'offset2': offset + 10,
+        'count': project.taxa().count(),
     })
     
             

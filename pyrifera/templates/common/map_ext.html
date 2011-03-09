@@ -4,8 +4,137 @@
     <script type="text/javascript" src="{{MEDIA_URL}}d3.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}stream.js"></script>
     <script src="{{MEDIA_URL}}flowplayer/example/flowplayer-3.2.4.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{MEDIA_URL}}jquery.ba-throttle-debounce.min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}jquery-autocomplete-r3.2.2/jquery.autocomplete.js"></script>
     <link rel="stylesheet" href="{{MEDIA_URL}}jquery-autocomplete-r3.2.2/jquery.autocomplete.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="{{MEDIA_URL}}search.css" type="text/css" media="screen" charset="utf-8">
+    <script type="text/javascript" charset="utf-8">
+        google.load("search", "1");
+
+        var html_decode = function(h){ return $('<p>'+h+'</p>').text(); };
+        var search_url;
+
+        function rsList(){
+            var ph = $('#search_panel').parent().parent().parent().height();
+            var sph = $('#search_panel').height();
+            var sfh = $('#search_footer').height();
+            $('#search_list').height(ph - sph - sfh - 21);
+        }
+        
+        var req;
+        
+        var qValue;
+        
+        function onTaxonSubmit(offset){
+            if(req && req.abort){
+                req.abort();
+            }
+            image_queue = [];
+            var val = $('#query').val();
+            if(qValue === val){
+                return;
+            }else{
+                qValue = val;
+                var url = search_url + '?q=' + val;
+                if(offset){
+                    url = url + '&offset='+offset;
+                }
+                req = $.getJSON(url, onRetrieveTaxonSearchResults);
+            }
+        }
+        
+        function onRetrieveTaxonSearchResults(data){
+            $('span.count').html(data['count']);
+            $('span.offset').html(data['offset']);
+            $('span.offset2').html(data['offset2']);
+            $('a.nav.back').toggleClass('disabled', data['offset'] === 0);
+            $('#search_list ul').html(data['results'].join('\n'));
+            loadImages($('#search_list'));
+        }
+
+        function setupAutocomplete(el){
+            {% load absurl %}
+            var base_url = "{% absurl monitoring.views.autocomplete %}";
+            search_url = "{% absurl monitoring.views.autocomplete2 %}";
+
+            el.parent().submit(function(e){
+                e.preventDefault();
+                onTaxonSubmit();
+            });
+            
+            $('#query').keydown($.debounce(200, function(){
+                onTaxonSubmit();
+            }));
+            
+            
+            // el.autocomplete({
+            //     url: base_url,
+            //     delay: 200,
+            //     matchSubset: false,
+            //     autoFill: false,
+            //     onItemSelect: function(){
+            //         var i = $('#query');
+            //         i.val(html_decode(i.val()));
+            //     }
+            // });
+            google.search.Search.getBranding($('#search_footer .powered')[0], google.search.Search.HORIZONTAL_BRANDING);   
+        }
+        
+        var image_queue;
+        var queue_position;
+        var search;
+        
+        google.setOnLoadCallback(function(){
+            search = new google.search.ImageSearch();
+            search.setSearchCompleteCallback(this, searchComplete, null);
+            search.setResultSetSize(1);
+            search.setRestriction(google.search.ImageSearch.RESTRICT_RIGHTS, google.search.ImageSearch.RIGHTS_REUSE);
+        });
+                        
+        function loadImages(container){
+            queue_position = 0;
+            image_queue = container.find('.image_results');
+            if(queue_position < image_queue.length){
+                loadNext();
+            }
+        }
+        
+        function loadNext(){
+            var el = $(image_queue[queue_position]);
+            var term = el.data('search-term');
+            if(term && term.length){
+                search.execute(term);                
+            }else{
+                queue_position++;
+                if(queue_position < image_queue.length){
+                    loadNext();
+                }
+            }
+        }
+        
+        function searchComplete(){
+            if(image_queue.length === 0){
+                // probably updated search terms already
+                return;
+            }
+            var el = $(image_queue[queue_position]);
+            if(search.results && search.results.length > 0){
+                var result = search.results[0];
+                var node = result.html.cloneNode(true);
+                el.append(node);
+                el.css('background-color', 'transparent').css('border', 'none');
+                el.find('a.gs-image').click(function(e){
+                    window.open(result.originalContextUrl);
+                    e.preventDefault();
+                });
+            }
+            queue_position++;
+            if(queue_position < image_queue.length){
+                loadNext();
+            }
+        }
+        
+    </script>
     <style id="videostyle" type="text/css" media="screen">
         /* styling of the container. */
 
@@ -87,6 +216,7 @@
     var search_panel;
 
     $(lingcod).bind('earthReady', function(e, ge, gex){
+                
         $('#panel-holder').prepend('<div id="spc">');
 
         search_panel = lingcod.panel({appendTo: $('#spc'), 
@@ -115,7 +245,6 @@
     
     $('.project_list a[rel=sidebar]').live('click', function(e){
         var href = $(this).attr('href');
-        console.log(href);
         e.preventDefault();
         search_panel.showUrl(href, {});
     });

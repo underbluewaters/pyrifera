@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.contrib.gis.db import models
 from django.template.loader import render_to_string
@@ -171,6 +172,21 @@ class Taxon(models.Model):
     def protocols(self):
         return Protocol.objects.filter(pk__in=MeanDensity.objects.filter(
             taxon=self).values_list('protocol', flat=True).distinct())
+    
+    def image_search_term(self):
+        name = self.name()
+        print name
+        for excluded in ExcludedAffix.objects.all():
+            print excluded.affix
+            name = re.split('(?i)\W'+excluded.affix.replace('.', '\\.') + '\W', name)[0]
+            name = re.split('(?i)\W'+excluded.affix.replace('.', '\\.') + '$', name)[0]
+            print name
+        for excluded in ExcludedSearchTerms.objects.all():
+            print excluded.term
+            name = name.replace(excluded.term.replace('.', '\\.'), '')
+            print name
+        print name.strip()
+        return name.strip()
 
 
 class Unit(models.Model):
@@ -298,3 +314,26 @@ class WaterTemperature(models.Model):
     site = models.ForeignKey('SamplingSite', blank=False)
     date = models.DateTimeField(db_index=True, blank=False)
     celsius = models.DecimalField(blank=False, max_digits=5, decimal_places=3)
+    
+    
+class ExcludedSearchTerms(models.Model):
+    """Used to exclude terms from use in image search. For example, you may 
+    want to exclude "Acid Weed" for obvious reasons. 
+    "Miscellaneous" is also a good one to exclude.
+    """
+    term = models.CharField(max_length=200, blank=False)
+
+    def __str__(self):
+        return self.term
+
+class ExcludedAffix(models.Model):
+    """Use to exclude endings of names from image search term. For example, 
+    "Macrocystis pyrifera Adult (> 30cm)". In this case we can store Adult. 
+    Any excluded Affix and text following it will be removed from the Taxon 
+    image_search_term.
+    """
+    affix = models.CharField(max_length=200, blank=False)
+    
+    def __str__(self):
+        return self.affix
+    

@@ -1,10 +1,21 @@
-<li id="taxon_{{taxon.pk}}">
-    <a style="float:left;" href="http://www.arkive.org/lace-coral/stylaster-californicus/#src=portletV3web" title="ARKive species - Lace coral (Stylaster californicus)" ><img src="http://cdn2.arkive.org/media/CA/CADFC6B8-8F2C-4588-9819-4D5DA2DEE6D6/Presentation.Portlet/Lace-coral-Stylaster-californicus.jpg" alt="ARKive species - Lace coral (Stylaster californicus)" title="ARKive species - Lace coral (Stylaster californicus)" border="0"></a>
-    <h3>{{taxon.name}}</h3>
-    {% ifequal taxon.protocols.count 1 %}
-    <p>This taxon is sampled by the {% for protocol in taxon.protocols %}<a href="#">{{protocol.name|lower}}</a>{% endfor %} protocol</p>
+<li class="taxon_result" id="taxon_{{object.pk}}">
+    <div class="image_results" data-search-term="{{object.image_search_term}}"></div>
+    <h3>{{object.name}}<span class="common_name">{{object.common_name}}</span></h3>
+    {% ifequal object.protocols.count 1 %}
+    <p>This species is sampled by the {% for protocol in object.protocols %}<a class="protocol" href="#">{{protocol.name|lower}}</a>{% endfor %} protocol.</p>
+    <p><a href="#" class="view_data">View Data →</a></p>
     {% else %}
-    <p>This taxon is sampled in multiple protocols: {% for protocol in taxon.protocols %}<a href="#">{{protocol.name}}</a>, {% endfor %}</p>
+        {% ifequal object.protocols.count 0 %}
+        <p>No data currently available for this species.</p>
+        {% else %}
+        <p>Sampled via the following protocols:
+            <ul>
+                {% for protocol in object.protocols %}
+                    <li><a href="#">{{protocol.name|lower}}</a> protocol</li>
+                {% endfor %}
+            </ul>
+        </p>
+        {% endifequal %}
     {% endifequal %}
     <br style="clear: both;">
 </li>

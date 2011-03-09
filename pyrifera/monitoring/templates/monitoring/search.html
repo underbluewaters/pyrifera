@@ -1,137 +1,15 @@
 {% extends 'common/panel.html' %}
 {% block title %}{% endblock title %}
 {% block panel %}
-<style id="searchpanelstyle" type="text/css" media="screen">
-
-    #search_panel {
-        position:relative;
-        width:500px;
-        height:100px;
-        background-color:#ebebeb;
-        z-index:0;
-        background: -moz-linear-gradient(100% 100% 90deg, #ebebeb, #EAEAEA);
-        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ebebeb), to(#E4E4E4));
-        margin:0;
-        margin-left:-13px;
-        border-bottom:solid 1px #ccc;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -o-user-select: none;
-        user-select: none;
-    }
-    
-    #search_panel a.close {
-        position:absolute;
-        right:5px;
-        top:0px;
-    }
-    
-    #search_panel h3 {
-        margin:0;
-        padding:0;
-        padding-top:10px;
-        padding-left:10px;
-        margin-bottom:10px;
-    }
-    
-    #search_panel input, #search_panel a.button {
-        float:left;
-        margin:0px;
-    }
-    
-    #search_panel input {
-        margin-left:10px;
-        margin-top:5px;
-        width:350px;
-        font-size:18px;
-        height:1em;
-    }
-    
-    #search_panel a.button {
-        margin-left:10px;
-        margin-top:4px;
-        font-size:14px;
-        cursor:pointer;
-    }
-    
-    #search_panel p {
-        margin-left:10px;
-    }
-    
-    #search_footer {
-        position:absolute;
-        bottom:0;
-        width:500px;
-        padding:0;
-        margin:0;
-        margin-left:-13px;
-/*        margin-top:-10px;*/
-        padding:10px 0;
-/*        background-color:#E2F4FF;*/
-        background-color:#ebebeb;
-        background: -moz-linear-gradient(100% 100% 90deg, #ebebeb, #EAEAEA);
-        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ebebeb), to(#E4E4E4));
-        border-top:solid 1px #ccc;
-        
-    }
-    
-    #search_footer p {
-        padding:0;
-        margin:0;
-        height:14px;
-        float:right;
-    }
-    
-    #search_list {
-        overflow:auto;
-        width:500px;
-        margin:0;
-        margin-left:-13px;
-        padding:0;
-        background-color:white;
-    }
-    
-    #autocomplete {
-        position:absolute;
-        background-color:white;
-        top:60px;
-        left:0px;
-        width:80%;
-        text-indent:none;
-        margin:0px;
-        padding:5px;
-    }
-    
-    .acResults {
-        z-index:10000;
-    }
-
-</style>
 <script type="text/javascript" charset="utf-8">
-    function rsList(){
-        console.log('rslist');
-        var ph = $('#search_panel').parent().parent().parent().height();
-        var sph = $('#search_panel').height();
-        var sfh = $('#search_footer').height();
-        $('#search_list').height(ph - sph - sfh - 21);
-    }
-
     lingcod.onShow(function(){
         $('#search_panel input').focus();
         $('#search_panel').parent().parent().parent().css('overflow', 'hidden');
         $(window).bind('resize', rsList);
         rsList();
         $('a.close img').attr('src');
-        {% load absurl %}
-        var base_url = "{% absurl monitoring.views.json_search %}";
-        console.log(base_url);
-        $('#query').autocomplete({
-            url: base_url,
-            delay: 50,
-            matchSubset: false,
-            autoFill: false
-        });
+        setupAutocomplete($('#query'));
+        loadImages($('#search_list'));
     });
     
     lingcod.onHide(function(){
@@ -150,12 +28,13 @@
 </div>
 <div id="search_list">
     <ul>
-        {% for taxon in taxa %}
+        {% for object in taxa %}
             {% include "monitoring/search_result.html" %}
         {% endfor %}
     </ul>
 </div>
 <div id="search_footer">
-    <p>results 1 - 10 of 210 < ></p>
+    <div class="powered"></div>
+    <p>results <span class="offset">{{offset}}</span> - <span class="offset2">{{offset2}}</span> of <span class="count">{{count}}</span> <a href="#" class="nav back">prev</a> | <a href="#" class="nav forward">next</a></p>
 </div>
 {% endblock panel %}
