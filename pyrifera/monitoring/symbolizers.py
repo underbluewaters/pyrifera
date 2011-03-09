@@ -112,12 +112,12 @@ class ScaledImageSymbolizer:
 
     def lookat(self):
         dataset = list(self.dataset)
-        latest = None
+        earliest = None
         for record in dataset:
-            if latest is None or record.year > latest:
-                latest = record.year
+            if earliest is None or record.year < earliest:
+                earliest = record.year
         mp = MultiPoint([r.site.point for r in list(self.dataset)])
-        timestamp = str(latest) + "-12-31"
+        timestamp = str(earliest) + "-01-15"
         kml = calclookat(mp.envelope, timestamp)
         return kml
 
@@ -158,13 +158,12 @@ class ScaledImageSymbolizer:
             				<color>%s</color>
             			</IconStyle>
             		</Style>
-                    <name>%s - %s %s</name>
+                    <name>%s - %s %s %s</name>
                     <description><![CDATA[
                         <html>
                         <head>
                         <script type="text/javascript" src="%sd3.js"></script>
                         <script type="text/javascript">
-
                             var data = [%s];
                             var site_name = "%s";
                             var unit = '%s';
@@ -319,7 +318,7 @@ class ScaledImageSymbolizer:
                 record.year, record.year,
                 scale,
                 color,
-                site.name, record.mean, record.protocol.unit.suffix,
+                site.name, taxon.name(), record.mean, record.protocol.unit.suffix,
                 MEDIA_URL,
                 data,
                 site.name, record.protocol.unit.suffix, taxon.name(), 

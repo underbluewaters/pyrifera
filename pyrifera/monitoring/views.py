@@ -124,6 +124,9 @@ def species_lists(request, pk):
             'protocols': site.protocols.all()
         }, context_instance=RequestContext(request))
 
+from django.views.decorators.cache import cache_page
+
+# @cache_page(60 * 60 * 24 * 30)
 def proportional_symbols(request, pk, protocol_pk):
     taxon = get_object_or_404(Taxon, pk=pk)
     protocol = get_object_or_404(Protocol, pk=protocol_pk)

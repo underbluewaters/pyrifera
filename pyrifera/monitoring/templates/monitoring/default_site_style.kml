@@ -1,3 +1,13 @@
+<StyleMap id="{% if project %}{{project.app_label}}{% else %}default{% endif %}_site_stylemap">
+	<Pair>
+		<key>normal</key>
+		<styleUrl>#{% if project %}{{project.app_label}}_{% endif %}small_default</styleUrl>
+	</Pair>
+	<Pair>
+		<key>highlight</key>
+		<styleUrl>#{% if project %}{{project.app_label}}_{% endif %}large_default</styleUrl>
+	</Pair>
+</StyleMap>
 <Style id="{% if project %}{{project.app_label}}_{% endif %}small_default">
 	<IconStyle>
 		<scale>0.7</scale>
@@ -11,12 +21,6 @@
 		<color>00ffffff</color>
 		<scale>0</scale>
 	</LabelStyle>
-	<ListStyle>
-	    <ItemIcon>
-          <state>open closed</state>
-          <href>http://chart.apis.google.com/chart?chst=d_map_pin_letter&amp;chld=|{% block colorThree %}ffffff{% endblock colorThree %}</href>
-        </ItemIcon>
-	</ListStyle>
 	<BalloonStyle>
         {% block balloonStyle %}
         <text><![CDATA[
@@ -25,16 +29,6 @@
         {% endblock balloonStyle %}
     </BalloonStyle>
 </Style>
-<StyleMap id="{% if project %}{{project.app_label}}{% else %}default{% endif %}_site_stylemap">
-	<Pair>
-		<key>normal</key>
-		<styleUrl>#{% if project %}{{project.app_label}}_{% endif %}small_default</styleUrl>
-	</Pair>
-	<Pair>
-		<key>highlight</key>
-		<styleUrl>#{% if project %}{{project.app_label}}_{% endif %}large_default</styleUrl>
-	</Pair>
-</StyleMap>
 <Style id="{% if project %}{{project.app_label}}_{% endif %}large_default">
 	<IconStyle>
 		<scale>0.8</scale>

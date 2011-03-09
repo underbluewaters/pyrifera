@@ -2,6 +2,14 @@
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
     <Document>
         <NetworkLink>
+            <Style>
+            <ListStyle>
+        	    <ItemIcon>
+                  <state>open closed</state>
+                  <href>http://chart.apis.google.com/chart?chst=d_map_pin_letter&amp;chld=|{% block colorThree %}9BC34D{% endblock colorThree %}</href>
+                </ItemIcon>
+        	</ListStyle>
+        	</Style>
         	<name>Survey Sites</name>
         	<Link>
         	    {% load absurl %}

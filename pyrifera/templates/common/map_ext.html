@@ -211,6 +211,23 @@
             }
         }
         
+        function balloonOpening(e){
+            var f = e.getFeature();
+            // Test if part of a proportional symbol data layer
+            if(f.getUrl().indexOf('proportional') != -1){
+                e.preventDefault();
+                kmltreeManager._openBalloon(f, {
+                    api: {
+                        opts: {
+                            displayEnhancedContent: true, 
+                            sandboxedBalloonCallback: function(){}, 
+                            iframeSandbox: 'http://underbluewaters-try-unsafe-popups.googlecode.com/hg/src/iframe.html'
+                        }
+                    }
+                });
+            }
+        }
+        
     </script>
     <style id="videostyle" type="text/css" media="screen">
         /* styling of the container. */
@@ -294,7 +311,9 @@
     var search_panel;
 
     $(lingcod).bind('earthReady', function(e, ge, gex){
-                
+        
+        google.earth.addEventListener(ge, 'balloonopening', balloonOpening);
+        
         $('#panel-holder').prepend('<div id="spc">');
 
         search_panel = lingcod.panel({appendTo: $('#spc'), 
