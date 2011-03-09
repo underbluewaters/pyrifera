@@ -30,14 +30,14 @@
             if(!offset){
                 offset = 0;
             }
-            if(req && req.abort){
-                req.abort();
-            }
-            image_queue = [];
             var val = $('#query').val();
             if(qValue === val && cOffset === offset && !force){
                 return;
             }else{
+                if(req && req.abort){
+                    req.abort();
+                }
+                image_queue = [];
                 cOffset = offset;
                 qValue = val;
                 var url = search_url + '?q=' + val;
