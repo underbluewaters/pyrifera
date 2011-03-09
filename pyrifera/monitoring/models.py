@@ -175,17 +175,11 @@ class Taxon(models.Model):
     
     def image_search_term(self):
         name = self.name()
-        print name
         for excluded in ExcludedAffix.objects.all():
-            print excluded.affix
             name = re.split('(?i)\W'+excluded.affix.replace('.', '\\.') + '\W', name)[0]
             name = re.split('(?i)\W'+excluded.affix.replace('.', '\\.') + '$', name)[0]
-            print name
-        for excluded in ExcludedSearchTerms.objects.all():
-            print excluded.term
-            name = name.replace(excluded.term.replace('.', '\\.'), '')
-            print name
-        print name.strip()
+        for excluded in ExcludedSearchTerm.objects.all():
+            name = name.replace(excluded.term, '')
         return name.strip()
 
 
@@ -316,7 +310,7 @@ class WaterTemperature(models.Model):
     celsius = models.DecimalField(blank=False, max_digits=5, decimal_places=3)
     
     
-class ExcludedSearchTerms(models.Model):
+class ExcludedSearchTerm(models.Model):
     """Used to exclude terms from use in image search. For example, you may 
     want to exclude "Acid Weed" for obvious reasons. 
     "Miscellaneous" is also a good one to exclude.

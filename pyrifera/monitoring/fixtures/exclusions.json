@@ -1,0 +1,114 @@
+[
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 1,
+    "fields": {
+      "term": "Miscellaneous"
+    }
+  },
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 2,
+    "fields": {
+      "term": "Rock"
+    }
+  },
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 3,
+    "fields": {
+      "term": "Cobble"
+    }
+  },
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 4,
+    "fields": {
+      "term": "Acid Weed"
+    }
+  },
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 5,
+    "fields": {
+      "term": "Boulder"
+    }
+  },
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 6,
+    "fields": {
+      "term": "Bare Substrate"
+    }
+  },
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 7,
+    "fields": {
+      "term": "Sponges"
+    }
+  },
+  {
+    "model": "monitoring.excludedsearchterm",
+    "pk": 8,
+    "fields": {
+      "term": "spp."
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 1,
+    "fields": {
+      "affix": "Adult"
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 2,
+    "fields": {
+      "affix": "Subadult"
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 3,
+    "fields": {
+      "affix": "Juvenile"
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 4,
+    "fields": {
+      "affix": "Ad."
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 5,
+    "fields": {
+      "affix": "-"
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 6,
+    "fields": {
+      "affix": "Subadult"
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 7,
+    "fields": {
+      "affix": "Recruit"
+    }
+  },
+  {
+    "model": "monitoring.excludedaffix",
+    "pk": 6,
+    "fields": {
+      "affix": "All"
+    }
+  }
+]

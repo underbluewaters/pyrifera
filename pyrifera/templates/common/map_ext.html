@@ -24,16 +24,19 @@
         var req;
         
         var qValue;
+        var cOffset = 0;
         
         function onTaxonSubmit(offset){
+            console.log('onTaxonSubmit', offset);
             if(req && req.abort){
                 req.abort();
             }
             image_queue = [];
             var val = $('#query').val();
-            if(qValue === val){
+            if(qValue === val && cOffset === offset && val != ''){
                 return;
             }else{
+                cOffset = offset;
                 qValue = val;
                 var url = search_url + '?q=' + val;
                 if(offset){
@@ -44,10 +47,13 @@
         }
         
         function onRetrieveTaxonSearchResults(data){
+            $('#search_list').scrollTop(0);
             $('span.count').html(data['count']);
             $('span.offset').html(data['offset']);
             $('span.offset2').html(data['offset2']);
+            console.log('a.nav.back', $('a.nav.back'));
             $('a.nav.back').toggleClass('disabled', data['offset'] === 0);
+            $('a.nav.forward').toggleClass('disabled', data['offset2'] >= data['count']);
             $('#search_list ul').html(data['results'].join('\n'));
             loadImages($('#search_list'));
         }
@@ -66,7 +72,29 @@
                 onTaxonSubmit();
             }));
             
+            onTaxonSubmit();
             
+                        
+            var parent = el.parent().parent().parent();
+            console.log(parent);
+            parent.find('a.forward').click(function(e){
+                if($(this).hasClass('disabled')){
+                    return;
+                }
+                e.preventDefault();
+                var offset = (cOffset || 0) + 10;
+                console.log('forward', offset);
+                onTaxonSubmit(offset);
+            });
+
+            parent.find('a.back').click(function(e){
+                if($(this).hasClass('disabled')){
+                    return;
+                }
+                e.preventDefault();
+                onTaxonSubmit(cOffset - 10 || 0);
+            });
+
             // el.autocomplete({
             //     url: base_url,
             //     delay: 200,

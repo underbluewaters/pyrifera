@@ -8,5 +8,5 @@ admin.site.register(Taxon)
 admin.site.register(Protocol)
 admin.site.register(Unit)
 
-admin.site.register(ExcludedSearchTerms)
+admin.site.register(ExcludedSearchTerm)
 admin.site.register(ExcludedAffix)

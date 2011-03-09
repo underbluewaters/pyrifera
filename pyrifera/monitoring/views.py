@@ -47,6 +47,8 @@ def autocomplete2(request):
         offset2 = offset + n
     else:
         offset2 = offset + count
+    if offset2 > n:
+        offset2 = n
     results = results[offset:offset2]
     return HttpResponse(json.dumps({
         'count': n,

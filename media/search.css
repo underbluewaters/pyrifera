@@ -62,12 +62,10 @@
     margin:0;
     margin-left:-13px;
 /*        margin-top:-10px;*/
-    padding:10px 0;
+    padding:15px 0;
 /*        background-color:#E2F4FF;*/
     background-color:#ebebeb;
-    background: -moz-linear-gradient(100% 100% 90deg, #ebebeb, #EAEAEA);
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ebebeb), to(#E4E4E4));
-    border-top:solid 1px #ccc;
+    border-top:solid 1px #888;
     
 }
 
@@ -126,10 +124,10 @@
 .taxon_result .image_results {
     width:115px;
     height:100px;
-    background-color:#F1F1F1;
     border:1px dotted #E3E3E3;
     float:left;
     margin-right:10px;
+    background: #f1f1f1 url(images/camera) no-repeat center center;
 }
 
 .taxon_result a.protocol {
