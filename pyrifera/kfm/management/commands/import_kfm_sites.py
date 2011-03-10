@@ -25,7 +25,6 @@ class Command(BaseCommand):
             count += 1
             kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
             point = Point(ddm2dd("-" + row['Longitude']), ddm2dd(row['Latitude']))
-            print point.wkt
             site = SamplingSite(name=row['SiteName'], code=row["SiteCode"],
                 point=point, project=kfm)
             site.save()

@@ -5,6 +5,7 @@ import csv
 from django.db import transaction
 from datetime import datetime
 from decimal import *
+from fish import ProgressFish
 
 sites = dict()
 
@@ -24,9 +25,11 @@ class Command(BaseCommand):
         """
         kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
         WaterTemperature.objects.filter(site__project=kfm).delete()
+        fish = ProgressFish(total=file_len(path) - 1)
         reader = csv.DictReader(open(path))
         count = 0
         for row in reader:
+            fish.animate(amount=reader.line_num - 1)
             count += 1
             sitecode = str(row['SiteCode'])
             datet = datetime.strptime(row['Date'], "%m/%d/%Y %H:%M:%S")
@@ -53,3 +56,8 @@ def getSite(sitecode, project):
         except:
             return False
             
+def file_len(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
