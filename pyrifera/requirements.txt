@@ -1,0 +1,2 @@
+whoosh>=1.7.8
+django-haystack>=1.1
