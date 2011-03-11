@@ -294,7 +294,7 @@
                 <li><a href="{% url monitoring.views.search project.pk %}" rel="sidebar">Search or Browse Species Data</a></li>
                 <li id="nowShowing" style="display:none;"></li>
                 <li>
-                    <div class="tree" data-sites-url="{% absurl monitoring.views.sites_nl project.pk %}" id="{{project.pk}}"></div>
+                    <div class="tree" data-sites-url="{% absurl monitoring.views.sites_nl project.pk %}" id="project_sites_{{project.pk}}"></div>
                 </li>
             </ul>
         {% endfor %}
