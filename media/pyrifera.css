@@ -1,0 +1,24 @@
+div.project {
+    margin-left:10px;
+    margin-top:20px;
+    background: #f4f8fb url(./kfm/logo_large_bg.png) no-repeat 0px 30px;
+    min-height:300px;
+}
+
+div.project > ul {
+    margin-top:30px;
+    padding-left:175px;
+}
+
+div.project a.search {
+    padding:10px;
+    margin-left:8px;
+    padding-left:31px;
+    background: transparent url(images/search.png) no-repeat left center;
+    color:#14265E;
+    text-decoration:none;
+}
+
+div.project a.search:hover {
+    text-decoration:underline;
+}

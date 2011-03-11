@@ -10,17 +10,19 @@
             <name>{{site.name}}</name>
             <styleUrl>{{site.style_url}}</styleUrl>
             <description><![CDATA[
-                <h3>{{site.name}}</h3>
-                <p class="project">A {{site.project.name}} Site</p>
-                <p class="dates">1985-2009</p>
-                <h4>sampled here</h4>
-                <ul>
-                    {% for protocol in site.protocols.all %}
-                        <li>{{protocol.name}}</li>
-                    {% endfor %}
-                </ul>
-                <p class="videos">4 videos</p>
-                <a href="{% url monitoring.views.site site.pk %}" rel="sidebar">More Information</a>
+                <table width="300" height="60" class="popup">
+                    <h3><font color="#0F244A">{{site.name}}</font></h3>
+                    <p class="project"><img class="logo" src="{{MEDIA_URL}}kfm/logo_small.png"/>A {{site.project.name}} Site</p>
+                    <p class="dates">Sampled {{site.earliest}}-{{site.latest}}</p>
+                    {# <h4>sampled here</h4> #}
+                    {# <ul> #}
+                    {#     {% for protocol in site.protocols.all %} #}
+                    {#         <li>{{protocol.name}}</li> #}
+                    {#     {% endfor %} #}
+                    {# </ul> #}
+                    {# <p class="videos">{{site.videos.count}} videos</p> #}
+                    <td align="right"><a align="right" href="{% url monitoring.views.site site.pk %}" rel="sidebar">More Information</a></td>
+                </table>
                 ]]>
             </description>
             {{site.point.kml|safe}}

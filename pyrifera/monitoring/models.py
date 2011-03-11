@@ -98,8 +98,18 @@ class SamplingSite(models.Model):
 
     def years_sampled(self):
         """Returns all years that the site has been sampled."""
-        return self.mean_densities.order_by('year').values_list(
-            'year', flat=True).distinct('year')
+        if not hasattr(self, '_years_sampled'):
+            self._years_sampled = self.mean_densities.order_by('year'
+                ).values_list('year', flat=True).distinct('year')
+        return self._years_sampled
+    
+    def earliest(self):
+        """Earliest sampling date"""
+        return self.years_sampled()[0]
+    
+    def latest(self):
+        """Earliest sampling date"""
+        return list(self.years_sampled())[-1]
 
     @property
     def taxa(self):

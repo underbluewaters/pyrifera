@@ -8,6 +8,7 @@
     <script type="text/javascript" src="{{MEDIA_URL}}jquery-autocomplete-r3.2.2/jquery.autocomplete.js"></script>
     <link rel="stylesheet" href="{{MEDIA_URL}}jquery-autocomplete-r3.2.2/jquery.autocomplete.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="{{MEDIA_URL}}search.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="{{MEDIA_URL}}pyrifera.css" type="text/css" media="screen" charset="utf-8">
     <script type="text/javascript" charset="utf-8">
         google.load("search", "1");
 
@@ -278,6 +279,30 @@
         a.years:hover {
             text-decoration:underline;
         }
+
+
+        /* popup styling */
+        p.project img.logo {
+            margin-bottom:-5px;
+            margin-right:5px;
+        }
+        
+        table.popup h3 {
+            padding:0px;
+            margin:0px;
+            margin-top:5px;
+            margin-bottom:2px;
+        }
+        
+        table.popup p {
+            padding:3px;
+            margin:0;
+        }
+        
+        table.popup {
+            margin:0;
+            padding:0;
+        }
     </style>
 
 {% endblock headtwo %}
@@ -287,16 +312,31 @@
 
 {% block tabscontents %}
     <div id="Monitoring">
-        <p>Introduction Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>
+            Welcome to pyrifera, an interactive application for visualizing 
+            ecological monitoring data.
+        </p>
+        <p>
+            Pan around on the globe and click on placemarks to view content 
+            from survey sites such as underwater video and species lists. You
+            can also view data on species distribution by selecting 
+            <em>Search or Browse Species Data</em>.
+        </p>
+        <p>
+            Open up the supplemental layers menu (layers icon above) to toggle
+            datasets such as Marine Protected Areas.
+        </p>
         {% for project in projects.all %}
+        <div class="project" id="project_{{project.pk}}">
             <h2>{{project.name}}</h2>
             <ul class="project_list">
-                <li><a href="{% url monitoring.views.search project.pk %}" rel="sidebar">Search or Browse Species Data</a></li>
+                <li><a class="search" href="{% url monitoring.views.search project.pk %}" rel="sidebar">Search or Browse Species Data</a></li>
                 <li id="nowShowing" style="display:none;"></li>
                 <li>
                     <div class="tree" data-sites-url="{% absurl monitoring.views.sites_nl project.pk %}" id="project_sites_{{project.pk}}"></div>
                 </li>
-            </ul>
+            </ul>            
+        </div>
         {% endfor %}
         <!-- <p><input style="float:left;margin-right:1em;width:50%;padding-top:6px;" type="text" name="search" value="species name" id="search"><a id="speciessearch" href="#" class="button"><span>Search</span></a></p><br style="clear:both;" />
         <div id="sites_tree"></div> -->
@@ -346,3 +386,7 @@
         search_panel.showUrl(href, {});
     });
 {% endblock layersConfig %}
+
+{% block metanavigation %}
+<li><a href="#" id="about">about this site</a></li>    
+{% endblock metanavigation %}

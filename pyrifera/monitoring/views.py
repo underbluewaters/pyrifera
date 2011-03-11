@@ -21,6 +21,7 @@ def sites(request, project_pk):
     project = get_object_or_404(Project, pk=project_pk)
     return render_to_response('monitoring/sites.kml', {
         'project': project,
+        'MEDIA_URL': MEDIA_URL,
     }, mimetype="application/vnd.google-earth.kml+xml")
 
 def autocomplete(request):

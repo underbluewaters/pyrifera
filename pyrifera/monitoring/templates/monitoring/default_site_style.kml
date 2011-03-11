@@ -42,6 +42,13 @@
 		<color>00ffffff</color>
 		<scale>0</scale>
 	</LabelStyle>
+	<BalloonStyle>
+        {% block balloonStyle2 %}
+        <text><![CDATA[
+            $[description]
+        ]]></text>            
+        {% endblock balloonStyle2 %}
+    </BalloonStyle>
 	<ListStyle>
 	</ListStyle>
 </Style>
