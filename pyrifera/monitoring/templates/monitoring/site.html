@@ -384,8 +384,7 @@
         <ul>
             <li><a href="#SiteInfo"><span>Site Info</span></a></li>
             <li><a href="{% url monitoring.views.species_lists site.pk %}"><span>Species Lists</span></a></li>
-            <li><a href="#Streamgraphs"><span>Streamgraphs</span></a></li>
-            <li><a href="#SizeFrequency"><span>SizeFrequency</span></a></li>
+            <li><a href="#chart"><span>Create a Chart</span></a></li>
         </ul>
         <div id="SiteInfo">
             <p class="project">A {{site.project.name}} Site</p>
@@ -410,13 +409,10 @@
                 {% endfor %}
             </div>
         </div>
-        <div id="Streamgraphs">
+        <div id="chart">
             {% for protocol in site.protocols.all %}
                 <h4><a target="_blank" href="{% url monitoring.views.streamgraph site.pk protocol.pk %}">{{protocol.name}}</a></h4>
             {% endfor %}
-        </div>
-        <div id="SizeFrequency">
-            <p>....</p>
         </div>
     </div>
 {% endblock panel %}
