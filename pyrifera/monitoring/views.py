@@ -120,10 +120,20 @@ def site(request, pk):
     
 def species_lists(request, pk):
     site = get_object_or_404(SamplingSite, pk=pk)
+    protocols = site.protocols.all()
     return render_to_response('monitoring/species_lists.html', {
             'site': site, 
-            'protocols': site.protocols.all()
+            'protocols': protocols
         }, context_instance=RequestContext(request))
+        
+def protocol_species_list(request, site_pk, protocol_pk):
+    site = get_object_or_404(SamplingSite, pk=protocol_pk)
+    protocol = get_object_or_404(Protocol, pk=site_pk)
+    return render_to_response('monitoring/protocol_species_list.html', {
+            'site': site, 
+            'protocol': protocol,
+            'means': site.all_means_json(protocol),
+        }, context_instance=RequestContext(request))    
 
 from django.views.decorators.cache import cache_page
 

@@ -5,6 +5,7 @@ from django.contrib.gis.db import models
 from django.template.loader import render_to_string
 from django.template import Context, Template
 from django.utils import simplejson
+from django.db.models import Avg, Sum, Min, Max
 
 from monitoring import memoized
 
@@ -134,6 +135,45 @@ class SamplingSite(models.Model):
 
     def first_video(self):
         return [self.videos.all()[0]]
+      
+    def all_means_json(self, protocol):
+        results = {}
+        results['All Years'] = []
+        counted_taxa = Taxon.objects.filter(
+            pk__in=self.mean_densities.filter(
+                protocol=protocol, site=self).values_list('taxon').distinct())
+        for taxon in counted_taxa:
+            record = MeanDensity.objects.filter(taxon=taxon, site=self).aggregate(min_year=Min('year'), max_year=Max('year'), avg=Avg('mean'), sum_n=Sum('n'))
+            if record['avg'] > 0:
+                results['All Years'].append({
+                    'taxon': taxon.pk,
+                    'scientific_name': taxon.scientific_name,
+                    'common_name': taxon.common_name,
+                    'mean': record['avg'],
+                    'stderror': None,
+                    'n': record['sum_n'],
+                    'protocol': protocol.name,
+                    'site': self.name,
+                    'min_year': record['min_year'],
+                    'max_year': record['max_year'],
+                })
+        for record in MeanDensity.objects.filter(protocol=protocol, site=self).select_related('taxon'):
+            if record.mean > 0:
+                if record.year not in results:
+                    results[record.year] = []
+                results[record.year].append({
+                    'taxon': record.taxon.pk,
+                    'scientific_name': record.taxon.scientific_name,
+                    'common_name': record.taxon.common_name,
+                    'mean': record.mean,
+                    'stderror': record.stderror,
+                    'n': record.n,
+                    'protocol': protocol.name,
+                    'site': self.name,
+                })
+            
+            
+        return simplejson.dumps(results)
     
 class Taxon(models.Model):
     """Represents a particular species. 
