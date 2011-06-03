@@ -1,0 +1,64 @@
+{% extends 'common/panel.html' %}
+{% block title %}{{protocol.name}} Species List{% endblock title %}
+{% block panel %}
+    <style type="text/css" media="screen">
+    
+      ul.splist {
+        font-size:12px;
+        margin:0;
+        padding:0;
+      }
+      
+      ul.splist li {
+        text-indent:none;
+        width:100%;
+        position:relative;
+        padding:5px 0;
+        border-bottom:solid 1px #D9D9D9;
+      }
+      
+      ul.splist div.mark {
+        background-color:#9EBFDD;
+        position:absolute;
+        top:0px;
+        left:0px;
+        height:100%;
+        z-index:-1;
+      }
+    </style>
+    <script type="text/javascript" charset="utf-8">
+        lingcod.onShow(function(){
+                    
+          var data = {{means|safe}};
+          var key = "All Years";
+          var x = d3.scale.linear()
+            .domain([0, d3.max(data[key], function(d){return d.mean;})])
+            .range(["0px", "100%"]);
+          var chart = d3.select('#splist_{{protocol.pk}}');
+          chart.selectAll("li")
+              .data(function(){return data[key].sort(function(a, b){return b.mean - a.mean;});})
+            .enter().append("li")
+              .text(pickName)
+              .append('div')
+                .attr('class', 'mark')
+                .style('width', function(d){return x(d.mean);})
+                
+          function pickName(d){
+            var name = d.common_name;
+            if(!name || name === ''){
+              name = d.scientific_name;
+            }
+            return name;
+          }
+    
+        });
+    </script>
+    {% if not is_ajax and not request.is_ajax %}
+    <h1>{{protocol.name}} Species List</h1>
+    {% endif %}
+    <div>
+      
+    </div>
+    <ul id="splist_{{protocol.pk}}" class="splist">
+    </ul>
+{% endblock panel %}
