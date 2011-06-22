@@ -3,6 +3,7 @@
 {% block headtwo %}
     <script type="text/javascript" src="{{MEDIA_URL}}d3.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}stream.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}underscore-min.js"></script>
     <script src="{{MEDIA_URL}}flowplayer/example/flowplayer-3.2.4.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{MEDIA_URL}}jquery.ba-throttle-debounce.min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}jquery-autocomplete-r3.2.2/jquery.autocomplete.js"></script>
@@ -95,6 +96,7 @@
                 onTaxonSubmit(cOffset - 10 || 0);
             });
             
+            $('#search_list a.view_data').die('click');
             $('#search_list a.view_data').live('click', handleDataLinkClick);
 
             // el.autocomplete({
@@ -177,8 +179,12 @@
         function handleDataLinkClick(e){
             e.preventDefault();
             var a = $(this);
-            var href = a.attr('href');
-            loadPData(href, a.attr('title'));
+            if(searchChoiceCallback){
+                searchChoiceCallback(a);
+            }else{
+                var href = a.attr('href');
+                loadPData(href, a.attr('title'));                
+            }
         }
         
         var currentNl;
@@ -227,6 +233,28 @@
                     }
                 });
             }
+        }
+        
+        function moveSearchToForeground(){
+            var el = $('#spc');
+            el.detach();
+            $('#panel-holder').append(el);
+        }
+        
+        function moveSearchToBackground(){
+            var el = $('#spc');
+            el.detach();
+            $('#panel-holder').prepend(el);
+        }
+        
+        var searchChoiceCallback = false;
+        
+        function setSearchChoiceCallback(cback){
+            searchChoiceCallback = cback;
+        }
+        
+        function clearSearchChoiceCallback(){
+            searchChoiceCallback = false;            
         }
         
     </script>
@@ -302,6 +330,10 @@
         table.popup {
             margin:0;
             padding:0;
+        }
+        
+        .ui-widget {
+          font-size:12px;
         }
     </style>
 

@@ -170,6 +170,7 @@ class SamplingSite(models.Model):
                     'n': record.n,
                     'protocol': protocol.name,
                     'site': self.name,
+                    'year': record.year,
                 })
             
             

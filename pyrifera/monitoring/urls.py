@@ -13,4 +13,6 @@ urlpatterns = patterns('',
     (r'^streamgraphs/(\d+)/(\d+)/', 'monitoring.views.streamgraph'),
     (r'^proportional_symbols/(\d+)/(\d+)/', 'monitoring.views.proportional_symbols'),
     (r'^site_data/(\d+)/(\d+)/', 'monitoring.views.species_site_data'),
+    (r'^chart/(\d+)/', 'monitoring.views.chart'),
+    (r'^records/(\d+)/(\d+)/(\d+)/', 'monitoring.views.taxon_records'),
 )

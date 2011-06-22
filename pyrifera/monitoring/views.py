@@ -164,3 +164,30 @@ def species_site_data(request, taxon_pk, site_pk):
             "site": site,
             "observations": observations
         }, context_instance=RequestContext(request))
+        
+def chart(request, pk):
+    site = get_object_or_404(SamplingSite, pk=pk)
+    return render_to_response('monitoring/chart.html', {
+        'site': site,
+        }, 
+        context_instance=RequestContext(request))
+        
+        
+def taxon_records(request, pk, protocol_pk, site_pk):
+    print pk, protocol_pk, site_pk
+    taxon = get_object_or_404(Taxon, pk=pk)
+    site = get_object_or_404(SamplingSite, pk=site_pk)
+    protocol = get_object_or_404(Protocol, pk=protocol_pk)
+    records = [{
+        'taxon': taxon.pk,
+        'scientific_name': taxon.scientific_name,
+        'common_name': taxon.common_name,
+        'mean': record.mean,
+        'stderror': record.stderror,
+        'n': record.n,
+        'protocol': protocol.name,
+        'site': site.name,
+        'year': record.year,
+        'unit': protocol.unit.name,
+    } for record in MeanDensity.objects.filter(protocol=protocol, taxon=taxon, site=site).order_by('year')]
+    return HttpResponse(json.dumps(records), mimetype="text/json")

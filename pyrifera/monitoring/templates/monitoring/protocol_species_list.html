@@ -11,9 +11,9 @@
       
       ul.splist li {
         text-indent:none;
-        width:100%;
+        width:95%;
         position:relative;
-        padding:5px 0;
+        padding:5px 5px;
         border-bottom:solid 1px #D9D9D9;
       }
       
@@ -23,35 +23,184 @@
         top:0px;
         left:0px;
         height:100%;
-        z-index:-1;
+/*        z-index:-1;*/
+      }
+      
+      ul.results li:hover div.mark {
+        background-color:#96B6D2;
+      }
+        
+      ul.scale li {
+        height:15px;
+        border:none;
+      }
+      
+      ul.scale li.ticks {
+        height:8px;
+        border-bottom:solid 1px #A5A8AE;
+        border-right:solid 1px #BABDC4;
+        margin-bottom:5px;
+      }
+            
+      ul.scale li span {
+        position:absolute;
+        border-right:1px solid #A5A8AE;
+        width:40px;
+        margin-left:-45px;
+        height:18px;
+        bottom:0px;
+        padding-right:5px;
+        text-align:right;
+      }
+      
+      ul.scale li.unit {
+        font-size:14px;
+        margin-bottom:10px;
+      }
+      
+      ul.scale li span:first-child {
+        border-right:none;
+        border-left:1px solid #A5A8AE;
+        margin-left:0px;
+        padding-left:5px;
+        padding-right:0px;
+        text-align:left;
+      }
+      
+      ul.splist li span.mean {
+        display:none;
+        position:absolute;
+        right: 10px;
+        top:4px;
+      }
+      
+      ul.splist li:hover span.mean {
+        display:block;
+      }
+      
+      ul.results li:hover {
+        background-color:#DEE9ED;
+      }
+      
+      div.name {
+        z-index:2;
+        position:relative;
+      }
+      
+      select.year_selector {
+        position:absolute;
+        right:0px;
       }
     </style>
     <script type="text/javascript" charset="utf-8">
-        lingcod.onShow(function(){
-                    
-          var data = {{means|safe}};
-          var key = "All Years";
-          var x = d3.scale.linear()
-            .domain([0, d3.max(data[key], function(d){return d.mean;})])
-            .range(["0px", "100%"]);
-          var chart = d3.select('#splist_{{protocol.pk}}');
-          chart.selectAll("li")
-              .data(function(){return data[key].sort(function(a, b){return b.mean - a.mean;});})
-            .enter().append("li")
-              .text(pickName)
-              .append('div')
-                .attr('class', 'mark')
-                .style('width', function(d){return x(d.mean);})
-                
-          function pickName(d){
-            var name = d.common_name;
-            if(!name || name === ''){
-              name = d.scientific_name;
+        lingcod.onShow((function(){
+          return function(){
+            var data = {{means|safe}};
+            var keys = [];
+            for(var key in data){
+              keys.unshift(key);
             }
-            return name;
-          }
-    
-        });
+            
+            var nTics = 4;
+
+            var legend = d3.select('#spscale_{{protocol.pk}}');
+
+            legend.append('li')
+              .attr('class', 'unit')
+              .text('{{protocol.unit}}')
+              .append('select')
+                .attr('class', 'year_selector')
+                .attr('id', 'year_selector_{{protocol.pk}}')
+                  .selectAll('option')
+                      .data(keys).enter()
+                    .append('option')
+                      .text(function(d){return d;})
+
+            var year_selector = $('#year_selector_{{protocol.pk}}');
+            year_selector.change(function(){
+              redraw(year_selector.find('option:selected').text());
+            });
+            
+
+            var ticks = legend.append('li')
+              .attr('class', 'ticks')
+
+            var chart = d3.select('#splist_{{protocol.pk}}');
+
+            var min = 0;
+            var all_rows = [];
+            for(var key in data){
+              all_rows = all_rows.concat(data[key]);
+            }
+            var max = d3.max(all_rows, function(d){return d.mean;});
+            var x = d3.scale.linear()
+              .domain([min, max])
+              .range(["0px", "100%"]);
+            
+            function redraw(key){
+
+              var xticks = x.ticks(nTics);
+              // xticks.push(max);
+              ticks.selectAll('span')
+                  .data(xticks)
+                .enter().append('span')
+                  .text(function(d){return Math.round(d * 100) / 100;})
+                  .style('left', x)
+              ticks.append('br')
+                .style('clear', 'both')
+                
+              function dkey(d){
+                var dk = (d.year || 'All years').toString() + pickName(d);
+                return dk;
+              }
+
+              var rows = data[key].sort(function(a, b){
+                return b.mean - a.mean;
+              });
+              
+              var d = chart.selectAll("li")
+                  .data(rows, dkey)
+              
+                  
+              d.exit()
+                  .remove()
+
+              var lis = d.enter()
+                .append('li')
+                
+              
+              lis
+                .append('div')
+                  .attr('class', 'mark')
+                  .style('width', function(d){return x(d.mean);})
+                  .text('');
+              
+
+              lis.append('span')
+                .attr('class', 'mean')
+                .text(function(d){return Math.round(d.mean * 100) / 100;})
+
+              
+              lis
+                .append('div')
+                  .text(pickName)
+                  .attr('class', 'name');
+
+              
+            }
+            
+            function pickName(d){
+              var name = d.common_name;
+              if(!name || name === ''){
+                name = d.scientific_name;
+              }
+              return name;
+            }
+
+            year_selector.trigger('change');
+
+          }    
+        })());
     </script>
     {% if not is_ajax and not request.is_ajax %}
     <h1>{{protocol.name}} Species List</h1>
@@ -59,6 +208,8 @@
     <div>
       
     </div>
-    <ul id="splist_{{protocol.pk}}" class="splist">
+    <ul id="spscale_{{protocol.pk}}" class="splist scale">
+    </ul>
+    <ul id="splist_{{protocol.pk}}" class="splist results">
     </ul>
 {% endblock panel %}
