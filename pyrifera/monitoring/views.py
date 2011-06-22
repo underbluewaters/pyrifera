@@ -189,5 +189,6 @@ def taxon_records(request, pk, protocol_pk, site_pk):
         'site': site.name,
         'year': record.year,
         'unit': protocol.unit.name,
+        'unit_suffix': protocol.unit.suffix,
     } for record in MeanDensity.objects.filter(protocol=protocol, taxon=taxon, site=site).order_by('year')]
     return HttpResponse(json.dumps(records), mimetype="text/json")

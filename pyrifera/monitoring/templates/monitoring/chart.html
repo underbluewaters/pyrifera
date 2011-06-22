@@ -2,7 +2,15 @@
 {% block title %}{{site.name}} - Create a Chart{% endblock title %}
 {% block panel %}
 <style type="text/css" media="screen">
+    
+  #newChart {
+      margin:0;
+      padding:0;
+      margin-top:20px;
+  }
+
   #createAChart {
+    text-align:center;
     width:95%;
     height:310px;
     margin-left:auto;
@@ -16,8 +24,8 @@
       margin-left:5px;
       width:410px;
   }
-  
-  #chartTaxa li span {
+    
+  #chartTaxa li span.legend {
       width:20px;
       height:10px;
       position:absolute;
@@ -30,6 +38,23 @@
       right:0px;
   }
   
+  #chartTaxa li.nodata .remove {
+      display:none;
+  }
+  
+  #chartTaxa li.nodata span.legend {
+      background-color:#C0C0C0 !important;
+  }
+  
+  #chartTaxa li em.nodata {
+      display:none;
+  }
+  
+  #chartTaxa li.nodata em.nodata {
+      display:block;
+  }
+  
+  
   #addTaxa {
       position:absolute;
       right:20px;
@@ -40,6 +65,37 @@
       right:130px;
       margin-top:-3px;
       display:none;
+  }
+  
+  .chartTooltip {
+      position:absolute;
+      background-color:#FFF9E9;
+      border:solid #9E9E9E 1px;
+      z-index:50000;
+      padding:5px;
+  }
+  
+  .chartTooltip h4 {
+      margin:0;
+      padding:0;
+  }
+  
+  .chartTooltip p {
+      margin:0;
+      padding:1px 0px;
+      font-size:.9em;
+  }
+  
+  p.mean {
+      font-size:14px;
+      font-weight:bold;
+      color:#352A2A;
+  }
+  
+  a.remove {
+      color:#424C58;
+/*      text-decoration:none;*/
+/*      font-size:.8em;*/
   }
 </style>
 <script type="text/javascript" charset="utf-8">
@@ -61,6 +117,11 @@
         this.line = d3.svg.line()
             .x(function(d,i) { return this.x(i); })
             .y(function(d) { return -1 * d; })
+            
+        this.tooltip = d3.select('body')
+                          .append('div')
+                              .attr('class', 'chartTooltip')
+        
     }
     
     _.extend(SiteTimeChart.prototype, {
@@ -74,7 +135,7 @@
         x: d3.scale.linear(),
         y: {},
         lines: {},
-        colorScale: d3.scale.category20(),
+        colorScale: d3.scale.category10(),
         
         addTaxon: function(data){
             if(this.taxa.length >= this.limit){
@@ -108,6 +169,7 @@
             var list_elements = elements.enter()
                 .append('li')
                     .text(pickName)
+                    .attr('data-taxon', function(d){d.list_element = this;return null;})
             
             list_elements
                     .append('a')
@@ -120,8 +182,13 @@
                         })
             
             list_elements.append('span')
+                .attr('class', 'legend')
                 .text(' ')
                 .style('background-color', function(d, i){ return that.colorScale(d.id); })
+            
+            list_elements.append('em')
+                .attr('class', 'nodata')
+                .text(' no data at this site')
                 
             elements.exit()
                 .style('background-color', '#EACBCF')
@@ -131,6 +198,13 @@
                     .style('-moz-opacity', function(d, i){ return i; })
                     .style('-webkit-opacity', function(d, i){ return i; })
                     .remove()
+            if(this.taxa.length === 0){
+                $('#newChart').show();
+                $('#stddev').hide();
+            }else{
+                $('#newChart').hide();                
+                $('#stddev').show();
+            }
         },
         
         fetchRecords: function(taxon, cback){
@@ -140,7 +214,12 @@
             $.getJSON(url, function(data){
                 that.unspin();
                 taxon['records'] = data;
-                that.renderChart();
+                if(data.length === 0){
+                    $(taxon.list_element).addClass('nodata');
+                    that.taxa.pop();
+                }else{
+                    that.renderChart();                    
+                }
             });
         },
         
@@ -172,7 +251,7 @@
                     function(r){ return r.unit == unit });
                 var means = _.pluck(filtered, 'mean');
                 // Set min/max value for scale based on records
-                scale.domain([_.min(means), _.max(means)]);
+                scale.domain([0, _.max(means)]);
 
                 var classname = unit.replace(/[^A-z]/g, '');                
 
@@ -261,6 +340,17 @@
 
             this.g.selectAll('path.taxon').remove();
 
+            // add error bars
+            this.g.selectAll('line.errorbar').remove()
+            this.g.selectAll('line.errorbar')
+                .data(all_records).enter().append('svg:line')
+                    .attr('class', function(d){d.errorbar = this; return 'errorbar';})
+                    .attr('x1', function(d){return that.x(d.year);})
+                    .attr('x2', function(d){return that.x(d.year);})
+                    .attr('y1', function(d){return -1 * that.y[d.unit](d.mean - d.stderror)})
+                    .attr('y2', function(d){return -1 * that.y[d.unit](d.mean + d.stderror)})
+                    .style('stroke', '#FFCAD7')
+            
             // Now render the data
             var taxa = this.g.selectAll('path.taxon')
                 .data(this.taxa, function(d){ return d.id + d.protocol })
@@ -283,20 +373,33 @@
                     .attr('r', '3')
                     .style('stroke', 'white')
                     .style('fill', function(d){return that.colorScale(d.taxon);})
-                    .on('mouseover', that.mouseover)
-                    .on('mouseout', that.mouseout)
-                    .attr('title', function(d){return pickName(d);})
+                    .on('mouseover', function(d, i){that.mouseover.apply(that, [this, d, i]);})
+                    .on('mouseout', function(d, i){that.mouseout.apply(that, [this, d, i]);})
+                    .style('cursor', 'pointer')        
+                            
+            
         },
         
-        mouseover: function(d, i){
-            d3.select(this)
+        mouseover: function(el, d, i){
+            $(this.tooltip[0]).html('<h4>'+pickName(d)+'</h4>'+'<p class="year">'+d.year+' - '+d.protocol+'</p><p class="mean">'+(Math.round(d.mean * 100)/100)+' '+d.unit_suffix+'</p>');
+            var width = $(this.tooltip[0]).width();
+            if(event.pageX > 420 - width){
+                this.tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX-(width + 30))+"px");                                
+            }else{
+                this.tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+20)+"px");                
+            }
+            this.tooltip.style("display", 'block');
+            d3.select(d.errorbar).style('stroke', '#FF4B4D')
+            d3.select(el)
                 .style('stroke', '#FFED25')
                 .style('stroke-width', '3')
                 .attr('r', 5)
         },
         
-        mouseout: function(d, i){
-            d3.select(this)
+        mouseout: function(el, d, i){
+            this.tooltip.style("display", 'none');
+            d3.select(d.errorbar).style('stroke', '#FFCAD7')
+            d3.select(el)
                 .style('stroke', 'white')
                 .style('stroke-width', '1')
                 .attr('r', 3)
@@ -308,6 +411,10 @@
         
         unspin: function(){
             this.spinner.hide();
+        },
+        
+        destroy: function(){
+            this.tooltip.remove();
         }
     });
     
@@ -346,6 +453,7 @@
   {% endif %}
 
   <div id="createAChart">
+      <img id="newChart" src="{{MEDIA_URL}}images/new_chart.png" width="300" height="300">
   </div>
   <ul id="chartTaxa">
   </ul>
@@ -354,5 +462,5 @@
   <a id="addTaxa" href="#" class="button" onclick="this.blur(); return false;">
     <span>Add Taxa</span>
   </a>
-
+  <p style="display:none;" id="stddev">* red vertical lines indicate standard deviation.</p>
 {% endblock panel %}
