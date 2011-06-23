@@ -5,7 +5,7 @@
     {% ifequal object.protocols.count 1 %}
     <p>This species is sampled by the {% for protocol in object.protocols %}<a class="protocol" href="#">{{protocol.name|lower}}</a>{% endfor %} protocol.</p>
     {% for protocol in object.protocols %}
-    <p><a data-records-url="{% url monitoring.views.taxon_records object.pk protocol.pk 99999999999 %}" data-common_name="{{object.common_name}}" data-scientific_name="{{object.scientific_name}}" data-protocol="{{protocol.name}}" data-project="{{object.project.name}}" data-unit="{{protocol.unit.name}}" data-id="{{object.pk}}" type="application/vnd.google-earth.kml+xml" href="{% absurl monitoring.views.proportional_symbols object.pk protocol.pk %}" class="view_data" title="{{object.name}} {{protocol.name}} data">View Data →</a></p>
+    <p><a data-records-url="{% url monitoring.views.taxon_records object.pk protocol.pk 99999999999 %}" data-common_name="{{object.common_name}}" data-scientific_name="{{object.scientific_name}}" data-protocol="{{protocol.name}}" data-project="{{object.project.name}}" data-unit="{{protocol.unit.name}}" data-id="{{object.pk}}" type="application/vnd.google-earth.kml+xml" href="{% absurl monitoring.views.proportional_symbols object.pk protocol.pk %}" class="view_data" title="{{object.name}} {{protocol.name}} data">View Data</a></p>
     {% endfor %}
     {% else %}
         {% ifequal object.protocols.count 0 %}
