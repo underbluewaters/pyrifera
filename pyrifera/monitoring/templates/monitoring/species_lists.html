@@ -1,14 +1,6 @@
 {% extends 'common/panel.html' %}
 {% block title %}{{site.name}} Species Lists{% endblock title %}
 {% block panel %}
-    <script type="text/javascript" charset="utf-8">
-        {% for protocol in site.protocols.all %}
-        lingcod.onShow('#protocol_{{protocol.pk}}', function(){
-            var data = [{{means|safe}}]
-            alert('showing {{protocol.name}}');
-        });
-        {% endfor %}
-    </script>
     {% if not is_ajax and not request.is_ajax %}
     <h1>{{site.name}} Species Lists</h1>
     {% endif %}
@@ -18,10 +10,5 @@
                 <li><a href="{% url monitoring.views.protocol_species_list protocol.pk site.pk %}">{{protocol.name}}</a></li>
             {% endfor %}
         </ul>
-        {# {% for protocol in site.protocols.all %} #}
-        {#     <div id="protocol_{{protocol.pk}}"> #}
-        {#         <img src="{{MEDIA_URL}}mockups/species_list.png" /> #}
-        {#     </div> #}
-        {# {% endfor %} #}
     </div>
 {% endblock panel %}

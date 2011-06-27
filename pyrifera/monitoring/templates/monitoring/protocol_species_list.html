@@ -18,8 +18,10 @@
       }
       
       ul.splist div.mark {
-        background-color:#9EBFDD;
+        background: #9EBFDD url({{MEDIA_URL}}images/data-background.png) repeat;
         position:absolute;
+        border-bottom:solid 1px #5F88C7;
+        border-right:solid 1px #7FACDD;
         top:0px;
         left:0px;
         height:100%;
@@ -27,7 +29,8 @@
       }
       
       ul.results li:hover div.mark {
-        background-color:#96B6D2;
+        background-color:#A8CFF2;
+        border-right:2px solid #FFBD00;
       }
         
       ul.scale li {
@@ -79,7 +82,7 @@
       }
       
       ul.results li:hover {
-        background-color:#DEE9ED;
+        background-color:#D1E7F9;
       }
       
       div.name {
@@ -136,10 +139,15 @@
             var x = d3.scale.linear()
               .domain([min, max])
               .range(["0px", "100%"]);
+
+            var t = x.ticks(nTics);
+            var dx = t[1] - t[0] // difference between the ticks. 
+            var x1 = dx * ticks.length; // extend one extra tick value. 
+            x.domain([0, dx * t.length]) // widen the domain 
+            var xticks = x.ticks(t.length) // request one extra tick than
             
             function redraw(key){
-
-              var xticks = x.ticks(nTics);
+              // var xticks = x.ticks(nTics);
               // xticks.push(max);
               ticks.selectAll('span')
                   .data(xticks)

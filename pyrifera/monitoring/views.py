@@ -3,11 +3,12 @@ from monitoring.models import *
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 import json
-from symbolizers import ColladaSymbolizer, ScaledImageSymbolizer
-from settings import MEDIA_URL
+from symbolizers import ScaledImageGChartSymbolizer
+from settings import MEDIA_URL, MEDIA_ROOT
 import operator
 from haystack.query import SearchQuerySet, SQ
 from django.http import HttpResponse
+import Image, ImageFont, ImageDraw
 
 def projects(request):
     """Renders a kml file representing projects."""
@@ -15,7 +16,7 @@ def projects(request):
     return render_to_response('monitoring/projects.kml', {
             "projects": projects
         }, mimetype="application/vnd.google-earth.kml+xml")
-        
+
 def sites(request, project_pk):
     """Renders a kml file with all sites for a given project."""
     project = get_object_or_404(Project, pk=project_pk)
@@ -136,16 +137,18 @@ def protocol_species_list(request, site_pk, protocol_pk):
         }, context_instance=RequestContext(request))    
 
 from django.views.decorators.cache import cache_page
+from lingcod.kmlapp.views import create_kmz
 
-@cache_page(60 * 60 * 24 * 30)
+# @cache_page(60 * 60 * 24 * 30)
 def proportional_symbols(request, pk, protocol_pk):
     taxon = get_object_or_404(Taxon, pk=pk)
     protocol = get_object_or_404(Protocol, pk=protocol_pk)
     observations = MeanDensity.objects.filter(taxon=taxon, protocol=protocol).order_by(
         'year').select_related('site')
-    symbolizer = ColladaSymbolizer(observations)
-    symbolizer = ScaledImageSymbolizer(observations)
+    # symbolizer = ColladaSymbolizer(observations)
+    symbolizer = ScaledImageGChartSymbolizer(observations)
     sites = taxon.project.sites.all()
+    # template = 
     return render_to_response('monitoring/proportional_symbols.kml', {
             "taxon": taxon,
             "protocol": protocol,
@@ -192,3 +195,14 @@ def taxon_records(request, pk, protocol_pk, site_pk):
         'unit_suffix': protocol.unit.suffix,
     } for record in MeanDensity.objects.filter(protocol=protocol, taxon=taxon, site=site).order_by('year')]
     return HttpResponse(json.dumps(records), mimetype="text/json")
+    
+def taxon_overlay(request, pk):
+    taxon = get_object_or_404(Taxon, pk=pk)
+    fontfile = MEDIA_ROOT + 'Didact_Gothic/DidactGothic.ttf'
+    im = Image.new("RGBA", (400, 210), (0,0,0,0))
+    dr = ImageDraw.Draw(im)
+    font = ImageFont.truetype('arial.ttf', 24)
+    dr.text((10,10), 'Hi There '+taxon.name(), fill='#ffccff', font=font)
+    response = HttpResponse(mimetype="image/png")
+    im.save(response, "PNG")
+    return response

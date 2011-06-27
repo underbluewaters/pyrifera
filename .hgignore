@@ -3,3 +3,5 @@ syntax: glob
 settings_local.py
 *.orig
 pyrifera/haystack*
+.DS_Store
+pip-log.txt

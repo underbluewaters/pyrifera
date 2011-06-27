@@ -122,7 +122,7 @@
             search.setResultSetSize(1);
             search.setRestriction(google.search.ImageSearch.RESTRICT_RIGHTS, google.search.ImageSearch.RIGHTS_REUSE);
             $('#nowShowing a img').live('click', function(){
-                clearPData();
+                clearCurrentDocument();
                 var sites_li = $('li.kmltree-item:first')
                 if(!sites_li.hasClass('visible')){
                     sites_li.find('.toggler').click();                
@@ -187,54 +187,44 @@
             }
         }
         
-        var currentNl;
+        var currentDocument;
         
         function loadPData(href, title){
             var sites_li = $('li.kmltree-item:first')
             if(sites_li.hasClass('visible')){
                 sites_li.find('.toggler').click();                
             }
-            if(currentNl){
-                clearPData();
-            }
-            var link = ge.createLink('');
-            link.setHref(href);
-
-            var networkLink = ge.createNetworkLink('');
-            networkLink.set(link, true, true); // Sets the link, refreshVisibility, and flyToView
-
-            ge.getFeatures().appendChild(networkLink);
-            currentNl = networkLink;
-            $('#nowShowing').html('<a href="#"><img src="{{MEDIA_URL}}common/images/close.png"></a>Now showing '+title);
-            $('#nowShowing').show();
+            clearCurrentDocument();
+            
+            $("a[href='"+href+"']").addClass('loading');
+            
+            console.log(href);
+            google.earth.fetchKml(ge, href, function(kmlObject){
+                console.log('fetched', kmlObject);
+                $("a[href='"+href+"']").removeClass('loading');
+                if(kmlObject){
+                    currentDocument = kmlObject;
+                    kmlObject.setVisibility(true);
+                    ge.getFeatures().appendChild(kmlObject);
+                    $('#nowShowing').html('<a href="#"><img src="{{MEDIA_URL}}common/images/close.png"></a>Now showing '+title);
+                    $('#nowShowing').show();
+                }else{
+                    alert('Could not load '+title);
+                }
+            });            
         }
         
-        function clearPData(){
-            $('#nowShowing').hide();
-            $('#nowShowing').html('');
-            if(currentNl){
-                ge.getFeatures().removeChild(currentNl);
-                currentNl = null;
-            }
+        function clearCurrentDocument(){
+          if(currentDocument){
+              $('#nowShowing').hide();
+              $('#nowShowing').html('');
+              if(currentDocument){
+                  ge.getFeatures().removeChild(currentDocument);
+                  currentDocument = null;
+              }
+          }
         }
-        
-        function balloonOpening(e){
-            var f = e.getFeature();
-            // Test if part of a proportional symbol data layer
-            if(f.getUrl().indexOf('proportional') != -1){
-                e.preventDefault();
-                kmltreeManager._openBalloon(f, {
-                    api: {
-                        opts: {
-                            displayEnhancedContent: true, 
-                            sandboxedBalloonCallback: function(){}, 
-                            iframeSandbox: 'http://underbluewaters-try-unsafe-popups.googlecode.com/hg/src/iframe.html'
-                        }
-                    }
-                });
-            }
-        }
-        
+                
         function moveSearchToForeground(){
             var el = $('#spc');
             el.detach();
@@ -266,9 +256,6 @@
             padding:0;
             padding:15px;
             margin-left:-15px;
-/*            width:490px;*/
-/*            overflow:hidden;*/
-/*            background-color:black;*/
         }
 
         a.myPlayer {
@@ -277,10 +264,8 @@
         	height:313px; 
         	text-align:center;
         	margin:5px 0;
-/*          margin-left:-10px;*/
         	padding:0;
         	float:left;
-/*          border:1px solid #999;*/
             border:none;
         }
 
@@ -292,7 +277,6 @@
 
         /* when container is hovered we alter the border color */
         a.myPlayer:hover {
-/*          border:1px solid #000;*/
             border:none;
         }
 
@@ -334,6 +318,32 @@
         
         .ui-widget {
           font-size:12px;
+        }
+        
+        li.taxon_result a.loading {
+            padding-left:25px;
+            background:url({{MEDIA_URL}}common/images/small-loader.gif) no-repeat;
+        }
+        
+        #nowShowing {
+            width:200px;
+            text-indent:0;
+            position:relative;
+            left:45px;
+            margin:20px 0px 5px 0px;
+        }
+        
+        #nowShowing a {
+            position:absolute;
+            left:-25px;
+            top:2px;
+        }
+        
+        #Monitoring li.KmlNetworkLink > .icon {
+            width:12px !important;
+            background-size:12px 16px !important;
+            -webkit-background-size:12px 16px !important;
+            -moz-background-size:12px 16px !important;
         }
     </style>
 
@@ -384,7 +394,7 @@
 
     $(lingcod).bind('earthReady', function(e, ge, gex){
         
-        google.earth.addEventListener(ge, 'balloonopening', balloonOpening);
+        {# google.earth.addEventListener(ge, 'balloonopening', balloonOpening); #}
         
         $('#panel-holder').prepend('<div id="spc">');
 
@@ -394,6 +404,10 @@
         $('#search_panel a.close').live('click', function(e){
             search_panel.hide();
             e.preventDefault();
+        });
+        
+        google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
+            search_panel.hide();
         });
             
         $('.project_list').each(function(){
@@ -405,7 +419,7 @@
                 element: tree_el,
                 bustCache: true,
                 setExtent: true,
-                displayEnhancedContent: true,
+                displayEnhancedContent: false,
                 supportItemIcon: true
             });
             tree.load();
