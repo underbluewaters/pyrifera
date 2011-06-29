@@ -10,6 +10,8 @@ from kfm.management.commands.import_kfm_temp import Command as ImportTemp
 from kfm.management.commands.import_kfm_quad_1m import Command as ImportQuad1m
 from kfm.management.commands.import_kfm_quad_5m import Command as ImportQuad5m
 from kfm.management.commands.import_kfm_rpc import Command as ImportRpc
+from kfm.management.commands.import_kfm_band import Command as ImportBand
+from kfm.management.commands.import_kfm_fish_transects import Command as ImportFishTransect
 
 
 paths = (
@@ -20,6 +22,8 @@ paths = (
     'KFM 1 m Quadrata Summary 1982-2010.txt',   # 4
     'KFM 5 m Quadrata Summary 1996-2010.txt',   # 5
     'KFM RPCs Summary 1982-2010.txt',           # 6
+    'KFM BandTransect Summary 1982-2010.txt',   # 7
+    'KFM Fish Transect 1 Normalized 1985-2010.txt', # 8
 )
 
 class Command(BaseCommand):
@@ -40,6 +44,10 @@ class Command(BaseCommand):
         ImportQuad5m().execute(join(path, paths[5]))
         print "Importing RPC"
         ImportRpc().execute(join(path, paths[6]))
+        print "Importing Band Transect"
+        ImportBand().execute(join(path, paths[7]))
+        print "Importing Fish Transect"
+        ImportFishTransect().execute(join(path, paths[8]))
         print "Importing Temperature Data"
         ImportTemp().execute(join(path, paths[3]))
         print "Done"

@@ -68,6 +68,9 @@ class Project(models.Model):
     def taxa(self):
         return self.taxon_set.all().order_by('scientific_name')
 
+    def protocols_json(self):
+        return simplejson.dumps([p.name for p in self.protocol_set.all().order_by('name')])
+
 class SiteManager(models.GeoManager):
     
     def with_extras(self):
@@ -103,6 +106,13 @@ class SamplingSite(models.Model):
             self._years_sampled = self.mean_densities.order_by('year'
                 ).values_list('year', flat=True).distinct('year')
         return self._years_sampled
+    
+    def sampling_events_json(self):
+        events = dict()
+        years = self.years_sampled()
+        for year in years:
+            events[year] = [str(p) for p in self.mean_densities.values_list('protocol__name', flat=True).distinct('protocol')]
+        return simplejson.dumps(events)
     
     def earliest(self):
         """Earliest sampling date"""
@@ -242,8 +252,8 @@ class Unit(models.Model):
     example a record of 4 would be displayed as "4 per m\u00B2"
     
     """
-    name = models.CharField(max_length=10)
-    suffix = models.CharField(max_length=10)
+    name = models.CharField(max_length=14)
+    suffix = models.CharField(max_length=14)
 
     def __unicode__(self):
         return self.name
@@ -291,7 +301,7 @@ class MeanDensity(models.Model):
     month = models.IntegerField(blank=True, null=True)
     day = models.IntegerField(blank=True, null=True)
     mean = models.FloatField(blank=False)
-    stderror = models.FloatField(blank=False)
+    stderror = models.FloatField(blank=True, null=True)
     n = models.IntegerField(blank=True, null=True)
     
     def __unicode__(self):

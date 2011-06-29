@@ -27,6 +27,57 @@
         circle.area {
           fill: #fff;
         }
+        
+        #protocol_listing {
+            text-indent:0;
+            margin:0;
+            padding:15px 0;
+        }
+        
+        .protocolElement {
+            float:left;
+            padding:0;
+            margin:0;
+            margin-right:10px;
+        }
+        
+        .protocolElement > .toggler {
+            cursor: default !important;
+        }
+        
+        #sampling_events {
+            width:95%;
+            font-size:0.8em;
+            padding:10px 0;
+            padding-bottom:20px;
+            padding-left:10px;
+        }
+        
+        #sampling_events .year {
+            float:left;
+            overflow: visible;
+            text-align:center;
+            text-indent:-5px;
+        }
+        
+        #sampling_events .protocol_count {
+            background-color:#DEDEDE;
+            float:left;
+        }
+
+        a.myPlayer, a.myPlayer:hover {
+            border:solid black 4px;
+            margin-top:15px;
+        }
+        
+        a.years {
+            padding:0 2px;
+        }
+        
+        a.nowPlaying {
+            background-color:#AACAF0;
+        }
+        
     </style>
     <script type="text/javascript" charset="utf-8">
         lingcod.onShow(function(){
@@ -44,6 +95,44 @@
             
             $('.years:first').click();
                         
+            var years_sampled = {{site.sampling_events_json|safe}};
+            var all_protocols = {{site.project.protocols_json|safe}};
+            var sampled_protocols = _.unique(_.flatten(_.values(years_sampled)));
+            
+            // d3.select('#protocol_listing').selectAll('li')
+            //     .data(all_protocols).enter()
+            //     .append('li')
+            //         .text(String)
+            //         .attr('class', function(d){
+            //             return _.include(sampled_protocols, d) ? 'visible protocolElement' : 'protocolElement';
+            //         })
+            //         .append('div')
+            //             .attr('class', 'toggler')
+            
+            var sampling_years = _.keys(years_sampled);
+            var min_year = {{min_year}};
+            var max_year = {{max_year}};
+            var year_ticks = d3.range(min_year, max_year + 1);
+            var events_table = d3.select('#sampling_events');
+            var color_scale = d3.scale.category20c();
+            
+            events_table.selectAll('div.protocol_count')
+                .data(year_ticks).enter().append('div')
+                    .html('&nbsp;')
+                    .attr('class', 'protocol_count')
+                    .style('width', (100.0 / year_ticks.length) + '%')
+                    .style('background-color', function(d){return (d in years_sampled) ? color_scale(years_sampled[d].length) : 'none'})
+            
+            events_table.append('br')
+                .style('clear', 'both');
+            
+            events_table.selectAll('div.year')
+                .data(year_ticks).enter().append('div')
+                    .html(function(d, i){ if(i % 4 === 0){return d;}else{return '&nbsp;';}})
+                    .attr('class', 'year')
+                    .style('width', (100.0 / year_ticks.length) + '%')
+
+
             {% if temperatures %}
             // ====== Begin Temperature visualization code =======
             
@@ -387,17 +476,14 @@
             <li><a href="{% url monitoring.views.chart site.pk %}"><span>Create a Chart</span></a></li>
         </ul>
         <div id="SiteInfo">
-            <p class="project">A {{site.project.name}} Site</p>
-            <p class="dates">Surveyed <a href="#">{{site.earliest}}-{{site.latest}}</a></p>
-            <h4>sampled here</h4>
-            <ul>
-                {% for protocol in site.protocols.all %}
-                    <li>{{protocol.name}}</li>
-                {% endfor %}
-            </ul>
+            {# <p class="project">A {{site.project.name}} Site</p> #}
+            <h3>Sampled {{site.earliest}} - {{site.latest}}</h3>
+            {# <ul id="protocol_listing"></ul> #}
+            {# <br style="clear:both;"> #}
+            <div id="sampling_events"></div>
             <div id="temp"></div>
             <div class="videos">
-                <h2>Underwater Video Transects</h2>
+                <h3>Underwater Video Transects</h3>
                 {% for video in site.videos.all %}
                     <a class="myPlayer" id="video_{{video.pk}}"
                     	href="{{video.url}}" {% if video.full_thumbnail %}style="background-image:url('{{video.full_thumbnail}}');"{% endif %}>

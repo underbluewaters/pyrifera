@@ -1,3 +1,0 @@
-{% extends 'monitoring/default_site_style.kml' %}
-{% block color %}359BEE{% endblock color %}
-{% block colorTwo %}359BEE{% endblock colorTwo %}

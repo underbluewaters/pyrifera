@@ -81,6 +81,15 @@
     	       <styleUrl>#scaledImageHover</styleUrl>
     	   </Pair>
     	</StyleMap>
+    	<ScreenOverlay>
+          <name>Absolute Positioning: Top left</name>
+          <Icon>
+            <href>{{symbolizer.overlay_src}}</href>
+          </Icon>
+          <overlayXY x="0.5" y="1" xunits="fraction" yunits="fraction"/>
+          <screenXY x="0.5" y="1" xunits="fraction" yunits="fraction"/>
+          <size x="0" y="0" xunits="fraction" yunits="fraction"/>
+        </ScreenOverlay>
         <name>{{taxon.name}} Observations</name>
         {% for placemark in symbolizer.placemarks %}
             {{ placemark|safe }}

@@ -5,6 +5,7 @@ from django.contrib.gis.measure import Distance, D
 from math import pi, sin, tan, sqrt, pow
 from monitoring import taxonLineChart
 from django.core.urlresolvers import reverse
+from urllib import urlencode
 
 class ColladaSymbolizer:
     
@@ -111,6 +112,8 @@ class ScaledImageGChartSymbolizer:
         self.sites = sites
         self.minScale = minScale
         self.maxScale = maxScale
+        chtt = urlencode({'chtt': dataset[0].taxon.name()})
+        self.overlay_src = "http://chart.apis.google.com/chart?chf=bg,s,67676700&chs=600x193&cht=ls&chds=-10,103.333&chd=t0:46.856,17.632,28.781,63.82,81.759&chdlp=b&chls=1&chma=5,5,5,25|4,4&chm=@o,FF0000,0,0.35:0.92,15.667|@t%%3D+None+Observed,FF0000,0,0.38:1,21,1|@tYellow+Circles+Scale+Proportionally+with+Quantity+Observed,FFFF88,0,0.1:0.5,22&%s&chts=E8F4F7,32" % (chtt, )
 
     def lookat(self):
         dataset = list(self.dataset)
@@ -125,7 +128,6 @@ class ScaledImageGChartSymbolizer:
 
     @property
     def placemarks(self):
-        overlay_template = "http://chart.apis.google.com/chart?chf=bg,s,67676700&chs=600x193&cht=ls&chds=-10,103.333&chd=t0:46.856,17.632,28.781,63.82,81.759&chdlp=b&chls=1&chma=5,5,5,25|4,4&chm=@o,FF0000,0,0.35:0.92,15.667|@t%3D+None+Observed,FF0000,0,0.38:1,21,1|@tYellow+Circles+Scale+Proportionally+with+Quantity+Observed,FFFF88,0,0.1:0.5,22&chtt=Aplysia+californica&chts=E8F4F7,32"
         self.dataset = list(self.dataset)
         dataset = self.dataset
         means = [r.mean for r in dataset]

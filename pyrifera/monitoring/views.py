@@ -113,9 +113,12 @@ def site(request, pk):
     # for protocol in site.protocols.all():
     #     streamgraph_data = streamgraph_data + ("'%s': %s" % (protocol.name, records_to_json(site.mean_densities.filter(protocol=protocol))))
     # streamgraph_data = streamgraph_data + "}"
+    years = MeanDensity.objects.values_list('year', flat=True).distinct('year').order_by('year')
     return render_to_response('monitoring/site.html', {
         'site': site,
         'temperatures': ", ".join([("{'date':new Date('%s'), 'celsius': %s}" % (t.date.ctime(), t.celsius)) for t in site.watertemperature_set.all().order_by('date')]),
+        'min_year': years[0],
+        'max_year': years[len(years) - 1],
         }, 
         context_instance=RequestContext(request))
     

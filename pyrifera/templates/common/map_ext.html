@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="{{MEDIA_URL}}pyrifera.css" type="text/css" media="screen" charset="utf-8">
     <script type="text/javascript" charset="utf-8">
         google.load("search", "1");
+        
+        // alias jQuery for d3.js
+        Sizzle = jQuery;
 
         var html_decode = function(h){ return $('<p>'+h+'</p>').text(); };
         var search_url;
@@ -198,9 +201,7 @@
             
             $("a[href='"+href+"']").addClass('loading');
             
-            console.log(href);
             google.earth.fetchKml(ge, href, function(kmlObject){
-                console.log('fetched', kmlObject);
                 $("a[href='"+href+"']").removeClass('loading');
                 if(kmlObject){
                     currentDocument = kmlObject;
@@ -254,7 +255,7 @@
         div.videos {
             margin:0;
             padding:0;
-            padding:15px;
+            padding:0 15px;
             margin-left:-15px;
         }
 
@@ -354,31 +355,45 @@
 
 {% block tabscontents %}
     <div id="Monitoring">
-        <p>
-            Welcome to pyrifera, an interactive application for visualizing 
-            ecological monitoring data.
-        </p>
-        <p>
-            Pan around on the globe and click on placemarks to view content 
-            from survey sites such as underwater video and species lists. You
-            can also view data on species distribution by selecting 
-            <em>Search or Browse Species Data</em>.
-        </p>
-        <p>
-            Open up the supplemental layers menu (layers icon above) to toggle
-            datasets such as Marine Protected Areas.
-        </p>
         {% for project in projects.all %}
         <div class="project" id="project_{{project.pk}}">
             <h2>{{project.name}}</h2>
+            <p>
+                The National Park Service's Kelp Forest Monitoring Program at 
+                the California Channel Islands has been collecting valuable 
+                data on organism size and abundance in nearshore rocky reef 
+                habitat for nearly three decades. This interactive tool allows
+                you to visualize these data.
+            </p>
+            <p>
+                Pan around the globe to see where sampling has taken place. 
+                Click on sites to open popups and select 
+                "Site Information" to view underwater video transects, species
+                lists, and other information.
+            </p>
+            <p>
+                To see how organisms are distributed among the sampling sites 
+                , click on "Search or Browse Species Data" in 
+                the sidebar. You can also view Marine Protected Area 
+                boundaries and data layers collected by the Marine Life 
+                Protection Act Initiative by clicking on the layers icon 
+                above this sidebar.
+            </p>
             <ul class="project_list">
                 <li><a class="search" href="{% url monitoring.views.search project.pk %}" rel="sidebar">Search or Browse Species Data</a></li>
                 <li id="nowShowing" style="display:none;"></li>
                 <li>
                     <div class="tree" data-sites-url="{% absurl monitoring.views.sites_nl project.pk %}" id="project_sites_{{project.pk}}"></div>
                 </li>
-            </ul>            
+            </ul>
         </div>
+        <p>
+            For more information on how these data were collected, you can 
+            download the <a href="http://science.nature.nps.gov/im/units/medn/reports/docs/chis_kelp97.pdf" title="manual">the annual report</a> that details the program.
+        </p>
+        <p>
+            We welcome your feedback and suggestions. Please write to <a href="mailto:&#x70;&#x79;&#x72;&#x69;&#x66;&#x65;&#x72;&#x61;&#x40;&#x6D;&#x61;&#x72;&#x69;&#x6E;&#x65;&#x6D;&#x61;&#x70;&#x2E;&#x6F;&#x72;&#x67;">pyrifera@marinemap.org</a>
+        </p>    
         {% endfor %}
         <!-- <p><input style="float:left;margin-right:1em;width:50%;padding-top:6px;" type="text" name="search" value="species name" id="search"><a id="speciessearch" href="#" class="button"><span>Search</span></a></p><br style="clear:both;" />
         <div id="sites_tree"></div> -->
