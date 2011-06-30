@@ -13,7 +13,6 @@ from kfm.management.commands.import_kfm_rpc import Command as ImportRpc
 from kfm.management.commands.import_kfm_band import Command as ImportBand
 from kfm.management.commands.import_kfm_fish_transects import Command as ImportFishTransect
 
-
 paths = (
     'KFM Site Information.txt',                 # 0
     'KFM Species Name.txt',                     # 1

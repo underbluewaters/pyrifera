@@ -121,7 +121,7 @@
                     .html('&nbsp;')
                     .attr('class', 'protocol_count')
                     .style('width', (100.0 / year_ticks.length) + '%')
-                    .style('background-color', function(d){return (d in years_sampled) ? color_scale(years_sampled[d].length) : 'none'})
+                    .style('background-color', function(d){return (d in years_sampled) ? color_scale(years_sampled[d].length) : 'transparent'})
             
             events_table.append('br')
                 .style('clear', 'both');
@@ -135,6 +135,19 @@
 
             {% if temperatures %}
             // ====== Begin Temperature visualization code =======
+
+            d3.select('#temp')
+                .append('h3')
+                    .text('Temperature (degrees celsius)')
+
+            // Test run at page load. See common/map_ext.html
+            if(!window.supportsSvg){
+                d3.select('#temp')
+                    .append('p')
+                        .attr('class', 'unsupported')
+                        .html('This interactive chart requires a modern browser that supports SVG. To see it, please visit this site using <a href="http://www.google.com/chrome" title="Google Chrome - Get a fast new browser. For PC, Mac, and Linux">Google Chrome</a>, <a href="http://www.mozilla.com/en-US/firefox/new/" title="Mozilla Firefox Web Browser — Free Download">Firefox</a>, or <a href="http://www.ie9enhanced.com">Internet Explorer 9</a>.')
+                return;
+            }
             
             Array.prototype.binarySearch = function binarySearch(find, comparator) {
                 var low = 0, high = this.length - 1,
@@ -178,10 +191,6 @@
                     monthly.push(r);                    
                 }
             }
-
-            d3.select('#temp')
-                .append('h3')
-                    .text('Temperature (degrees celsius)')
             
             var w = 470,                        // width
                 h = 110,                         // height
@@ -338,7 +347,7 @@
                 if(mousex < 0){
                     a = true;
                 }
-                date = x.invert(mousex);
+                date = new Date(x.invert(mousex));
                 timeout = setTimeout(function(){
                     date.setHours(0);
                     date.setMinutes(0);
@@ -377,7 +386,6 @@
                     });
                     
                     var selected_record = data[index];
-
                     selectedDaily.pop();             
                     if(selected_record){
                         if(!a){
@@ -386,9 +394,8 @@
                     }
                     var dailypin = g.selectAll('circle.dailypin')
                         .data(selectedDaily, function(d){return d.date.getTime()})
-                    
                     dailypin.enter()
-                        .insert('svg:circle')
+                        .append('svg:circle')
                             .attr('class', 'dailypin')
                             .attr('stroke', 'black')
                             .attr('stroke-width', 0.5)
@@ -396,9 +403,7 @@
                             .attr('cy', function(d){return y(d.celsius);})
                             .attr('r', 2)
                             .attr('fill', '#CCC')
-                            
                     dailypin.exit().remove();
-                    
                     var daylabel = vis.selectAll('text.daylabel')
                         .data(selectedDaily, function(d){return d.date.getTime()});
                     daylabel.enter()
@@ -409,7 +414,6 @@
                             .attr('y', h - 5)
                             .attr("text-anchor", "end")
                             .attr('style', 'font-size: 0.7em; fill:grey;')
-        			        
                             
                         
                     daylabel.exit().remove()
@@ -441,7 +445,7 @@
                         .data(selectedMonthly, function(d){return d.date.getTime()})
                     
                     monthlypin.enter()
-                        .insert('svg:circle')
+                        .append('svg:circle')
                             .attr('class', 'monthly')
                             .attr('stroke', 'black')
                             .attr('stroke-width', 0.5)

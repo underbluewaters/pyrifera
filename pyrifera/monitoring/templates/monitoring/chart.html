@@ -189,15 +189,23 @@
             list_elements.append('em')
                 .attr('class', 'nodata')
                 .text(' no data at this site')
-                
-            elements.exit()
-                .style('background-color', '#EACBCF')
-                .transition()
-                    .duration(200)
-                    .style('opacity', function(d, i){ return i; })
-                    .style('-moz-opacity', function(d, i){ return i; })
-                    .style('-webkit-opacity', function(d, i){ return i; })
+
+            if($.browser.msie){
+                elements.exit()
                     .remove()
+                
+            }else{
+                // Only add transition if not IE
+                elements.exit()
+                    .style('background-color', '#EACBCF')
+                    .transition()
+                        .duration(200)
+                        .style('opacity', function(d, i){ return i; })
+                        .style('-moz-opacity', function(d, i){ return i; })
+                        .style('-webkit-opacity', function(d, i){ return i; })
+                        .remove()                
+            }
+                    
             if(this.taxa.length === 0){
                 $('#newChart').show();
                 $('#stddev').hide();
@@ -251,7 +259,9 @@
                     function(r){ return r.unit == unit });
                 var means = _.pluck(filtered, 'mean');
                 // Set min/max value for scale based on records
-                scale.domain([0, _.max(means)]);
+                scale.domain([0, 
+                    // If scale is 0.0 - 0.0, set to 0.0 - 1.0
+                    _.max(means) || 1]);
 
                 var classname = unit.replace(/[^A-z]/g, '');                
 
@@ -383,10 +393,13 @@
         mouseover: function(el, d, i){
             $(this.tooltip[0]).html('<h4>'+pickName(d)+'</h4>'+'<p class="year">'+d.year+' - '+d.protocol+'</p><p class="mean">'+(Math.round(d.mean * 100)/100)+' '+d.unit_suffix+'</p>');
             var width = $(this.tooltip[0]).width();
-            if(event.pageX > 420 - width){
-                this.tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX-(width + 30))+"px");                                
+            // For the benefit of good `ol IE
+            var pageX = event.pageX || event.clientX;
+            var pageY = event.pageY || event.clientY;
+            if(pageX > 420 - width){
+                this.tooltip.style("top", (pageY-10)+"px").style("left",(pageX-(width + 30))+"px");                                
             }else{
-                this.tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+20)+"px");                
+                this.tooltip.style("top", (pageY-10)+"px").style("left",(pageX+20)+"px");                
             }
             this.tooltip.style("display", 'block');
             d3.select(d.errorbar).style('stroke', '#FF4B4D')
@@ -394,6 +407,7 @@
                 .style('stroke', '#FFED25')
                 .style('stroke-width', '3')
                 .attr('r', 5)
+        
         },
         
         mouseout: function(el, d, i){

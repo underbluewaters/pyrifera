@@ -13,8 +13,11 @@
     <script type="text/javascript" charset="utf-8">
         google.load("search", "1");
         
+        window.supportsSvg = !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGRect;
+        
         // alias jQuery for d3.js
         Sizzle = jQuery;
+        
 
         var html_decode = function(h){ return $('<p>'+h+'</p>').text(); };
         var search_url;
@@ -346,6 +349,17 @@
             -webkit-background-size:12px 16px !important;
             -moz-background-size:12px 16px !important;
         }
+        
+        p.unsupported {
+            padding:3px;
+            background-color:#EDE9D4;
+            border:solid 1px #998067;
+        }
+        
+        p.unsupported a {
+            color:#996E43;
+        }
+        
     </style>
 
 {% endblock headtwo %}
