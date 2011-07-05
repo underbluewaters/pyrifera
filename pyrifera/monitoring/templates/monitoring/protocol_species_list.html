@@ -100,9 +100,11 @@
           return function(){
             var data = {{means|safe}};
             var keys = [];
+            window.keys = keys;
             for(var key in data){
               keys.unshift(key);
             }
+            var keys = keys.sort().reverse();
             
             var nTics = 4;
 

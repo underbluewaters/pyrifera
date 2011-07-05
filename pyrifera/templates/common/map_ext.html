@@ -13,7 +13,7 @@
     <script type="text/javascript" charset="utf-8">
         google.load("search", "1");
         
-        window.supportsSvg = !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGRect;
+        window.supportsSvg = !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGRect && !window.svgweb;
         
         // alias jQuery for d3.js
         Sizzle = jQuery;

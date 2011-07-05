@@ -270,8 +270,9 @@
                 that.g.selectAll("."+classname)
                     .data(majorTics)
                     .enter().append('svg:text')
-                        .attr('class', classname + ' yLabels yAxis')
-                        .text(function(d){return (Math.round(d*100)/100).toString()})
+                        .attr('class', function(d){return classname + ' yLabels yAxis';})
+                        // .attr('class', classname + ' yLabels yAxis')
+                        .text(function(d){return (Math.round(d*100)/100).toString();})
                         .attr('x', that.yAxisX(i))
                         .attr('y', function(d){ return scale(d) * -1;})
                         .attr('text-anchor', 'end')
@@ -348,7 +349,7 @@
                     .style('stroke', '#AFB6BD')                
             }
 
-            this.g.selectAll('path.taxon').remove();
+            // this.g.selectAll('path.taxon').remove();
 
             // add error bars
             this.g.selectAll('line.errorbar').remove()
@@ -364,7 +365,6 @@
             // Now render the data
             var taxa = this.g.selectAll('path.taxon')
                 .data(this.taxa, function(d){ return d.id + d.protocol })
-                
             taxa.enter().append('svg:path')
                 .attr('class', 'taxon')
                 .style('stroke', function(d){return that.colorScale(d.id);})
@@ -372,7 +372,6 @@
                 .attr('d', function(d){ return that.lines[d.unit](d.records);})
             
             taxa.exit().remove();
-            
             // Add dots
             this.g.selectAll('circle.record').remove();
             this.g.selectAll('circle.record')
@@ -440,18 +439,36 @@
         
         moveSearchToForeground();
         
-        var chart = new SiteTimeChart(
-            $('#createAChart')[0], $('#chartTaxa')[0], $('.chartspinner'));
+        if(window.supportsSvg){
+            var chart;
+            function setupChart(){
+                chart = new SiteTimeChart(
+                    $('#createAChart')[0], $('#chartTaxa')[0], $('.chartspinner'));            
+            }
 
-        setSearchChoiceCallback(function(choice){
-            $('#search_panel a.close').click()
-            chart.addTaxon(choice.data());
-        });        
+            // if(window.svgweb){
+            //     window.onsvgload = setupChart;
+            // }else{
+                setupChart();
+            // }
+
+            setSearchChoiceCallback(function(choice){
+                $('#search_panel a.close').click()
+                chart.addTaxon(choice.data());
+            });        
+
+            $('#addTaxa').click(function(){
+                var href = "{% url monitoring.views.search 1 %}";
+                search_panel.showUrl(href, {});
+            });            
+        }else{
+            $('#addTaxa').hide();
+            d3.select('#createAChart')
+                .append('p')
+                    .attr('class', 'unsupported')
+                    .html('This interactive chart requires a modern browser that supports SVG. To see it, please visit this site using <a href="http://www.google.com/chrome" title="Google Chrome - Get a fast new browser. For PC, Mac, and Linux">Google Chrome</a>, <a href="http://www.mozilla.com/en-US/firefox/new/" title="Mozilla Firefox Web Browser — Free Download">Firefox</a>, or <a href="http://www.ie9enhanced.com">Internet Explorer 9</a>.')
+        }
         
-        $('#addTaxa').click(function(){
-            var href = "{% url monitoring.views.search 1 %}";
-            search_panel.showUrl(href, {});
-        });
         
     });
     

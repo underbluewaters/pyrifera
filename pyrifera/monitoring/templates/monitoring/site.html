@@ -116,12 +116,15 @@
             var events_table = d3.select('#sampling_events');
             var color_scale = d3.scale.category20c();
             
-            events_table.selectAll('div.protocol_count')
+            window.color_scale = color_scale;
+            var divs = events_table.selectAll('div.protocol_count')
                 .data(year_ticks).enter().append('div')
                     .html('&nbsp;')
                     .attr('class', 'protocol_count')
                     .style('width', (100.0 / year_ticks.length) + '%')
-                    .style('background-color', function(d){return (d in years_sampled) ? color_scale(years_sampled[d].length) : 'transparent'})
+                    .style('background-color', function(d){return (d in years_sampled) ? color_scale(years_sampled[d].length) : '#EBEBEB'})
+            
+            window.divs = divs;
             
             events_table.append('br')
                 .style('clear', 'both');

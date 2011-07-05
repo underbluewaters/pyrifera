@@ -1201,6 +1201,42 @@ if (typeof jQuery == "function") {
   d3_selectAll = jQuery;
 }
 
+(function(){
+  // CamelCase code copied from jQuery
+  var rdashAlpha = /-([a-z])/ig;
+  var fcamelCase = function( all, letter ) {
+  	return letter.toUpperCase();
+  };
+
+  function camelCase( string ) {
+    return string.replace( rdashAlpha, fcamelCase );
+  }
+
+  // IE < 9 does not support the style.setProperty method. These workarounds
+  // can be used to ensure that at least IE 8 (untested in earlier versions)
+  // can support calls to the d3 .style('att', 'value') method
+  window.d3_setStyleProperty = function(style, name, value, priority){
+    if ('setProperty' in style) {
+      style.setProperty(name, value, priority);
+    } else {
+      // For IE < 9
+      name = camelCase(name); // for properties like background-color
+      style.setAttribute(name, value, priority);
+    }
+  }
+
+  window.d3_removeStyleProperty = function(style, name){
+    if ('removeProperty' in style) {
+      style.removeProperty(name);
+    } else {
+      // For IE < 9
+      name = camelCase(name);
+      style.removeAttribute(name);
+    }
+  }
+})()
+
+
 /**
   * @public Returns the name of the renderer we're using -
   *
@@ -1252,25 +1288,27 @@ function setup_select_functions(){
         // svgweb returns an actual svg node created in the document for 
         // reasons I don't understand, but makes the proxy node available 
         // via _fakeNode
-        if(msie){
+        if(msie && '_fakeNode' in n){
             n = n._fakeNode;
-        }
-        if(!n._nodeXML){
-            throw('Could not find property _nodeXML');                
         }
         // svgweb proxy objects have a _nodeXML property containing an SVG 
         // document that is a representation of what the flash element is 
         // displaying. Each tag has an id that can be matched up to svgweb's 
         // internal DOM after finding matches
-        var results = querySelectorAll(s, n._nodeXML);
+        var results = querySelectorAll(s, ('_nodeXML' in n) ? n._nodeXML : n);
 
         // now create or fetch _Elements representing these DOM nodes
         if(results){
             var nodes = createNodeList();
             for (var i = 0; i < results.length; i++) {
-              var elem = n._handler._getNode(results[i], n._handler);
-              n._getFakeNode(elem)._attached = n._attached;
-              nodes.push(elem);
+              if ('_handler' in n || ('_fakeNode' in n && '_handler' in n._fakeNode)){
+                var handler = n._handler || n._fakeNode._handler;
+                var elem = handler._getNode(results[i], handler);
+                n._getFakeNode(elem)._attached = n._attached;
+                nodes.push(elem);
+              }else{
+                nodes.push(results[i]);
+              }
             }          
         }
         return nodes;
@@ -1656,40 +1694,22 @@ function d3_selection(groups) {
         return window.getComputedStyle(this, null).getPropertyValue(name);
       });
     }
-
-    function setStyleProperty(style, name, value, priority){
-      if ('setProperty' in style) {
-        style.setProperty(name, value, priority);
-      } else {
-        // For IE < 9
-        style.setAttribute(name, value, priority);
-      }
-    }
-
-    function removeStyleProperty(style, name){
-      if ('removeProperty' in style) {
-        style.removeProperty(name);
-      } else {
-        // For IE < 9
-        style.removeAttribute(name);
-      }
-    }
     
     /** @this {Element} */
     function styleNull() {
-      removeStyleProperty(this.style, name);
+      d3_removeStyleProperty(this.style, name);
     }
 
     /** @this {Element} */
     function styleConstant() {
-      setStyleProperty(this.style, name, value, priority);
+      d3_setStyleProperty(this.style, name, value, priority);
     }
 
     /** @this {Element} */
     function styleFunction() {
       var x = value.apply(this, arguments);
-      if (x == null) removeStyleProperty(this.style, name);
-      else setStyleProperty(this.style, name, x, priority);
+      if (x == null) d3_removeStyleProperty(this.style, name);
+      else d3_setStyleProperty(this.style, name, x, priority);
     }
 
     return groups.each(value == null
@@ -1743,7 +1763,10 @@ function d3_selection(groups) {
         this.removeChild(this.firstChild);        
       }
       // call with second argument for svgweb. Doesn't affect normal rendering
-      this.appendChild(document.createTextNode(value, true));
+      this.appendChild(document.createTextNode(value, 
+        // pass true if textNode will be rendered by svgweb
+        '_fakeNode' in this.parentNode || '_nodeXML' in this.parentNode
+      ));
     }
 
     /** @this {Element} */
@@ -1754,7 +1777,10 @@ function d3_selection(groups) {
           this.removeChild(this.firstChild);        
         }
         // call with second argument for svgweb. Doesn't affect normal rendering
-        this.appendChild(document.createTextNode(x, true));
+        this.appendChild(document.createTextNode(x, 
+        // pass true if textNode will be rendered by svgweb
+          '_fakeNode' in this.parentNode || '_nodeXML' in this.parentNode
+        ));
       }
     }
     return groups.each(typeof value === "function"
@@ -1900,8 +1926,8 @@ function d3_selection(groups) {
 
     // remove the old event listener, and add the new event listener
     return groups.each(function(d, i) {
-      if (this[name]) this.removeEventListener(typo, this[name], capture);
-      if (listener) this.addEventListener(typo, this[name] = l, capture);
+      if (this[name]) $(this).unbind(typo, this[name]);
+      if (listener) $(this).bind(typo, this[name] = l);
 
       // wrapped event listener that preserves i
       var node = this;
@@ -2186,11 +2212,7 @@ function d3_transition(groups) {
     function styleTween(d, i) {
       var f = tween.call(this, d, i, window.getComputedStyle(this, null).getPropertyValue(name));
       return f && function(t) {
-        if ('setProperty' in this.style) {
-          this.style.setProperty(name, f(t), priority);          
-        } else {
-          this.style.setAttribute(name, f(t), priority);
-        }
+        d3_setStyleProperty(this.style, name, f(t), priority);
       };
     }
 
