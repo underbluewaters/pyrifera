@@ -10,6 +10,7 @@ from haystack.query import SearchQuerySet, SQ
 from django.http import HttpResponse
 import Image, ImageFont, ImageDraw
 
+@cache_page(60 * 60 * 24 * 30)
 def projects(request):
     """Renders a kml file representing projects."""
     projects = Project.objects.all().order_by('name')
@@ -17,6 +18,7 @@ def projects(request):
             "projects": projects
         }, mimetype="application/vnd.google-earth.kml+xml")
 
+@cache_page(60 * 60 * 24 * 30)
 def sites(request, project_pk):
     """Renders a kml file with all sites for a given project."""
     project = get_object_or_404(Project, pk=project_pk)
@@ -61,6 +63,7 @@ def autocomplete2(request):
     
 
 
+@cache_page(60 * 60 * 24 * 30)
 def sites_nl(request, project_pk):
     """Renders an empty networklink pointed at monitoring.views.sites."""
     project = get_object_or_404(Project, pk=project_pk)
@@ -107,6 +110,7 @@ def streamgraph(request, site_pk, protocol_pk):
         'data': data
         }, context_instance=RequestContext(request))
 
+@cache_page(60 * 60 * 24 * 30)
 def site(request, pk):
     site = get_object_or_404(SamplingSite, pk=pk)
     # streamgraph_data = "{"
@@ -121,7 +125,8 @@ def site(request, pk):
         'max_year': years[len(years) - 1],
         }, 
         context_instance=RequestContext(request))
-    
+
+@cache_page(60 * 60 * 24 * 30)    
 def species_lists(request, pk):
     site = get_object_or_404(SamplingSite, pk=pk)
     protocols = site.protocols.all()
@@ -130,6 +135,7 @@ def species_lists(request, pk):
             'protocols': protocols
         }, context_instance=RequestContext(request))
         
+@cache_page(60 * 60 * 24 * 30)
 def protocol_species_list(request, site_pk, protocol_pk):
     site = get_object_or_404(SamplingSite, pk=protocol_pk)
     protocol = get_object_or_404(Protocol, pk=site_pk)
@@ -160,6 +166,7 @@ def proportional_symbols(request, pk, protocol_pk):
         }, mimetype="application/vnd.google-earth.kml+xml", 
         context_instance=RequestContext(request))
 
+@cache_page(60 * 60 * 24 * 30)
 def species_site_data(request, taxon_pk, site_pk):
     taxon = get_object_or_404(Taxon, pk=taxon_pk)
     site = get_object_or_404(SamplingSite, pk=site_pk)
@@ -179,6 +186,7 @@ def chart(request, pk):
         context_instance=RequestContext(request))
         
         
+@cache_page(60 * 60 * 24 * 30)
 def taxon_records(request, pk, protocol_pk, site_pk):
     print pk, protocol_pk, site_pk
     taxon = get_object_or_404(Taxon, pk=pk)
