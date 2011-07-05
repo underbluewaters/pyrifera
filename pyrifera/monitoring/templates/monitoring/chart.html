@@ -362,16 +362,19 @@
                     .attr('y2', function(d){return -1 * that.y[d.unit](d.mean + d.stderror)})
                     .style('stroke', '#FFCAD7')
             
+            var taxa = this.g.selectAll('path.taxon').remove();
+            
             // Now render the data
             var taxa = this.g.selectAll('path.taxon')
-                .data(this.taxa, function(d){ return d.id + d.protocol })
+                .data(this.taxa, function(d){ return d.id + d.protocol; })
+                        
             taxa.enter().append('svg:path')
                 .attr('class', 'taxon')
                 .style('stroke', function(d){return that.colorScale(d.id);})
                 .style('fill', 'none')
                 .attr('d', function(d){ return that.lines[d.unit](d.records);})
             
-            taxa.exit().remove();
+            
             // Add dots
             this.g.selectAll('circle.record').remove();
             this.g.selectAll('circle.record')
