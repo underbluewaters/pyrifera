@@ -142,7 +142,7 @@ def protocol_species_list(request, site_pk, protocol_pk):
 from django.views.decorators.cache import cache_page
 from lingcod.kmlapp.views import create_kmz
 
-# @cache_page(60 * 60 * 24 * 30)
+@cache_page(60 * 60 * 24 * 30)
 def proportional_symbols(request, pk, protocol_pk):
     taxon = get_object_or_404(Taxon, pk=pk)
     protocol = get_object_or_404(Protocol, pk=protocol_pk)
