@@ -9,6 +9,7 @@ import operator
 from haystack.query import SearchQuerySet, SQ
 from django.http import HttpResponse
 import Image, ImageFont, ImageDraw
+from django.views.decorators.cache import cache_page
 
 @cache_page(60 * 60 * 24 * 30)
 def projects(request):
@@ -145,7 +146,6 @@ def protocol_species_list(request, site_pk, protocol_pk):
             'means': site.all_means_json(protocol),
         }, context_instance=RequestContext(request))    
 
-from django.views.decorators.cache import cache_page
 from lingcod.kmlapp.views import create_kmz
 
 @cache_page(60 * 60 * 24 * 30)
