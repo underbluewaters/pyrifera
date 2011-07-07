@@ -377,26 +377,38 @@
         <div class="project" id="project_{{project.pk}}">
             <h2>{{project.name}}</h2>
             <p>
-                The National Park Service's Kelp Forest Monitoring Program at 
-                the California Channel Islands has been collecting valuable 
-                data on organism size and abundance in nearshore rocky reef 
-                habitat for nearly three decades. This interactive tool allows
-                you to visualize these data.
+                The Channels Islands National Park’s Kelp Forest Monitoring Program (KFMP) was established in 1981 to collect baseline information about the kelp forest ecosystem within the park. Monitoring began in 1982 with the establishment of 16 permanent long-term monitoring sites established between 1982-1986 at the five northernmost Channel Islands within the park. An additional site was added in 2001 at San Miguel Island, four sites were added at San Clemente Island in 2004 and monitored for only two years.  In 2005, 16 additional sites were added to assist in assessing the effectiveness of the newly established Marine Protected Areas (MPA) around the Channel Islands. These 16 sites were installed to collect baseline data from areas both inside and adjacent to the MPAs for later evaluation. Since their establishment, each Kelp Forest Monitoring (KFM) site has been visited at least once every year to collect size and abundance data on 70 species or groups of taxa that include algae, invertebrates and fish. The KFMP currently monitors 33 permanent sites annually, providing the longest set of fishery independent data along the west coast.
             </p>
             <p>
-                Pan around the globe to see where sampling has taken place. 
-                Click on sites to open popups and select 
-                "Site Information" to view underwater video transects, species
-                lists, and other information.
+                Pyrifera is an interactive tool that allows you to visualize the abundance data collected by the kelp forest monitoring program (KFMP) since its inception.  In addition, the KFMP has collected annual videos of the permanent transect since 1985 and these are also available for viewing on line for a virtual visit of the site.  
             </p>
             <p>
-                To see how organisms are distributed among the sampling sites 
-                , click on "Search or Browse Species Data" in 
-                the sidebar. You can also view Marine Protected Area 
-                boundaries and data layers collected by the Marine Life 
-                Protection Act Initiative by clicking on the layers icon 
-                above this sidebar.
+                Pan around the globe to see where sampling has taken place. Click on sites to open popups and select "Site Information" to view underwater video transects, species lists, and other information. 
             </p>
+            <p>
+                To see how organisms are distributed among the sampling sites, click on "Search or Browse Species Data" in the sidebar. You can also view Marine Protected Area boundaries and data layers collected by the Marine Life Protection Act Initiative by clicking on the layers icon above this sidebar.
+            </p>
+            {# <p> #}
+            {#     The National Park Service's Kelp Forest Monitoring Program at  #}
+            {#     the California Channel Islands has been collecting valuable  #}
+            {#     data on organism size and abundance in nearshore rocky reef  #}
+            {#     habitat for nearly three decades. This interactive tool allows #}
+            {#     you to visualize these data. #}
+            {# </p> #}
+            {# <p> #}
+            {#     Pan around the globe to see where sampling has taken place.  #}
+            {#     Click on sites to open popups and select  #}
+            {#     "Site Information" to view underwater video transects, species #}
+            {#     lists, and other information. #}
+            {# </p> #}
+            {# <p> #}
+            {#     To see how organisms are distributed among the sampling sites  #}
+            {#     , click on "Search or Browse Species Data" in  #}
+            {#     the sidebar. You can also view Marine Protected Area  #}
+            {#     boundaries and data layers collected by the Marine Life  #}
+            {#     Protection Act Initiative by clicking on the layers icon  #}
+            {#     above this sidebar. #}
+            {# </p> #}
             <div class="project_list_holder">
                 <ul class="project_list">
                     <li><a class="search" href="{% url monitoring.views.search project.pk %}" rel="sidebar">Search or Browse Species Data</a></li>
@@ -408,9 +420,20 @@
             </div>
         </div>
         <p>
-            For more information on how these data were collected, you can 
-            download the <a href="http://science.nature.nps.gov/im/units/medn/reports/docs/chis_kelp97.pdf" title="manual">the annual report</a> that details the program.
+            Channel Islands National Park’s kelp forest monitoring program is one of many monitoring programs in the National Park’s that help to provide valuable resource information to assist in better managing resources for now and future generations.  For more information about the National Park Service’s Inventory and Monitoring Program please visit: 
+            <a href="http://science.nature.nps.gov/im/units/medn/im/index.cfm">http://science.nature.nps.gov/im/units/medn/im/index.cfm</a>
         </p>
+        <p>
+            For more information on the KFMP such as the monitoring handbook which contain monitoring protocols or annual reports, please visit: 
+            <a href="http://science.nature.nps.gov/im/units/medn/vitalsigns/kelpforestcommunities.cfm">http://science.nature.nps.gov/im/units/medn/vitalsigns/kelpforestcommunities.cfm</a>
+        </p>
+        <p>
+            Please note a newer version of the handbook is in preparation and we hope to have it available by March, 2012 and draft copies are available upon request.
+        </p>
+        {# <p> #}
+        {#     For more information on how these data were collected, you can  #}
+        {#     download the <a href="http://science.nature.nps.gov/im/units/medn/reports/docs/chis_kelp97.pdf" title="manual">the annual report</a> that details the program. #}
+        {# </p> #}
         <p>
             We welcome your feedback and suggestions. Please write to <a href="mailto:&#x70;&#x79;&#x72;&#x69;&#x66;&#x65;&#x72;&#x61;&#x40;&#x6D;&#x61;&#x72;&#x69;&#x6E;&#x65;&#x6D;&#x61;&#x70;&#x2E;&#x6F;&#x72;&#x67;">pyrifera@marinemap.org</a>
         </p>    
