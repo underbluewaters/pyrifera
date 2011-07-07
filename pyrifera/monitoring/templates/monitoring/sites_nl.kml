@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
     <Document>
+        <LookAt>
+    		<longitude>-119.4902557584255</longitude>
+    		<latitude>33.52509555038895</latitude>
+    		<altitude>0</altitude>
+    		<heading>0.1356778933999989</heading>
+    		<tilt>0</tilt>
+    		<range>259412.4321137632</range>
+    		<altitudeMode>relativeToGround</altitudeMode>
+    		<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+    	</LookAt>
         <NetworkLink>
             <Style>
             <ListStyle>
