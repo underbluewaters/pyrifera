@@ -13,14 +13,16 @@
                 <table width="280" height="60" margin="0" padding="0" class="popup">
                     <tr>
                         <td>
-                    <h3><font color="#0F244A">{{site.name}}</font></h3>
-                    {# <p class="project"><img class="logo" src="{{MEDIA_URL}}kfm/logo_small.png"/>A {{site.project.name}} Site</p> #}
-                    <p class="dates">Sampled {{site.earliest}}-{{site.latest}}</p>
-                    </td>
+                            <h3><font color="#0F244A">{{site.name}}</font></h3>
+                            <p class="dates">Sampled {{site.earliest}}-{{site.latest}}</p>
+                        </td>
                     </tr>
                     <tr>
-                    <td align="right"><a align="right" href="{% url monitoring.views.site site.pk %}" rel="sidebar">Site Information</a></td>
-                </tr>
+                        <td align="right">
+                            <img style="margin-bottom:-5px;" class="logo" src="{{MEDIA_URL}}kfm/logo_small.png"/>
+                            <a align="right" href="{% url monitoring.views.site site.pk %}" rel="sidebar">Site Information</a>
+                        </td>
+                    </tr>
                 </table>
                 ]]>
             </description>

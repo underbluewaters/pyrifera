@@ -78,6 +78,12 @@
             background-color:#AACAF0;
         }
         
+        .marinemap-panel p.project {
+            margin:10px 0;
+            background: url({{MEDIA_URL}}above_tabs.png) bottom no-repeat;
+            padding-bottom: 20px;
+        }
+        
     </style>
     <script type="text/javascript" charset="utf-8">
         lingcod.onShow(function(){
@@ -476,6 +482,7 @@
         });
     </script>
     <h1>{{site.name}}</h1>
+    <p class="project"><img style="margin-bottom:-5px;" class="logo" src="{{MEDIA_URL}}kfm/logo_small.png"/>A National Park Service Kelp Forest Monitoring Site</p>
     <div class="tabs">
         <ul>
             <li><a href="#SiteInfo"><span>Site Info</span></a></li>
@@ -483,7 +490,6 @@
             <li><a href="{% url monitoring.views.chart site.pk %}"><span>Create a Chart</span></a></li>
         </ul>
         <div id="SiteInfo">
-            {# <p class="project">A {{site.project.name}} Site</p> #}
             <h3>Sampled {{site.earliest}} - {{site.latest}}</h3>
             {# <ul id="protocol_listing"></ul> #}
             {# <br style="clear:both;"> #}
