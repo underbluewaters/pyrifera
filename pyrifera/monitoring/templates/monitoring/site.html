@@ -202,7 +202,7 @@
             }
             
             var w = 470,                        // width
-                h = 110,                         // height
+                h = 220,                         // height
                 pt = 5,                         // padding top
                 pb = 5                          // bottom
                 pl = 20,                        // left
@@ -494,7 +494,6 @@
             {# <ul id="protocol_listing"></ul> #}
             {# <br style="clear:both;"> #}
             <div id="sampling_events"></div>
-            <div id="temp"></div>
             <div class="videos">
                 <h3>Underwater Video Transects</h3>
                 {% for video in site.videos.all %}
@@ -507,6 +506,7 @@
                     <a class="years" data-video="#video_{{video.pk}}" href="#video_{{video.pk}}">{{video.year}}</a>
                 {% endfor %}
             </div>
+            <div id="temp"></div>
         </div>
     </div>
 {% endblock panel %}
