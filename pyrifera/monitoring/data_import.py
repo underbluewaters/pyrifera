@@ -2,6 +2,7 @@ import csv
 
 from fish import ProgressFish
 from django.db import transaction
+from django.db.models import Q
 
 from monitoring.models import *
 
@@ -58,4 +59,13 @@ def file_len(fname):
         for i, l in enumerate(f):
             pass
     return i + 1
-    
+
+@transaction.commit_on_success
+def remove_taxa(protocol_name, taxa):
+    protocol = Protocol.objects.get(name=protocol_name)
+    print 'removing erroneous taxa...'
+    for name in taxa:
+        print name
+        taxon = Taxon.objects.get(Q(scientific_name=name) | Q(common_name=name))
+        MeanDensity.objects.filter(protocol=protocol, taxon=taxon).delete()
+    print 'removed data in %s for %s taxa' % (protocol.name, len(taxa))

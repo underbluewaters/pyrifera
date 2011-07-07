@@ -12,6 +12,9 @@ from kfm.management.commands.import_kfm_quad_5m import Command as ImportQuad5m
 from kfm.management.commands.import_kfm_rpc import Command as ImportRpc
 from kfm.management.commands.import_kfm_band import Command as ImportBand
 from kfm.management.commands.import_kfm_fish_transects import Command as ImportFishTransect
+from kfm.management.commands.kfm_remove_taxa import Command as RemoveTaxa
+from haystack.management.commands.rebuild_index import Command as RebuildIndex
+from monitoring.models import *
 
 paths = (
     'KFM Site Information.txt',                 # 0
@@ -49,4 +52,8 @@ class Command(BaseCommand):
         ImportFishTransect().execute(join(path, paths[8]))
         print "Importing Temperature Data"
         ImportTemp().execute(join(path, paths[3]))
+        RemoveTaxa().execute()
+        print "Must now rebuild search index"
+        RebuildIndex().execute()
         print "Done"
+        

@@ -3,7 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, AppCommand
 
 from monitoring.models import Project
-from monitoring.data_import import import_data
+from monitoring.data_import import import_data, remove_taxa
 
 class Command(BaseCommand):
     option_list = AppCommand.option_list
