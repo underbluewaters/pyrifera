@@ -162,7 +162,7 @@ class ScaledImageGChartSymbolizer:
                     <name>%s</name>
                     <description><![CDATA[
                         <h3>$[name] <a href="%s" rel="sidebar">see site info</a></h3>
-                        <h4>(%s) - %s %s %s</h4>
+                        <h4>(%s) - %s %.3f %s</h4>
                         <img src="%s" width="300" height="100">
                     ]]></description>
                     %s
