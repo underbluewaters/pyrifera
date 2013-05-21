@@ -4,7 +4,12 @@ Generating thumbnails
 To generate thumbnails for videos I used the following script:
 
 import os
-for file in os.listdir('/mnt/data/pyriferia/kfm_videos/'):
-    file = file.replace(' ', '\ ')
-    command = 'ffmpeg -i /mnt/data/pyriferia/kfm_videos/%s -ss 80 -s 480x320 /mnt/data/pyriferia/kfm_videos/%s.jpg' % (file, file,)
-    os.system(command)
+rootdir = '/var/www/kfm_videos/'
+for file in os.listdir(rootdir):
+    if not '.mp4.jpg' in file and not '.py' in file:
+        file = file.replace(' ', '\ ')
+        command = 'ffmpeg -i %s%s -an -vframes 1 -ss 80:00:00 -s 480x320 %s%s.%%03d.jpg' % (rootdir, file, rootdir, file,)
+        os.system(command)
+        src = '%s%s.001.jpg' % (rootdir, file)
+        dst = '%s%s.jpg' % (rootdir, file)
+        os.system('mv %s %s' % (src, dst))
