@@ -1,0 +1,3 @@
+[submodule "marinemap"]
+	path = marinemap
+	url = git@github.com:underbluewaters/marinemap.git
