@@ -1,4 +1,6 @@
+Django
 whoosh>=1.7.8
 django-haystack>=1.1
 fish
 pygooglechart
+-e git+https://github.com/underbluewaters/marinemap.git#egg=marinemap
