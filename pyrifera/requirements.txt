@@ -1,6 +1,7 @@
-Django
-whoosh>=1.7.8
-django-haystack>=1.1
+Django==1.5
+whoosh==1.8.4
+django-haystack==1.2.7
 fish
 pygooglechart
 -e git+https://github.com/underbluewaters/marinemap.git#egg=marinemap
+PIL

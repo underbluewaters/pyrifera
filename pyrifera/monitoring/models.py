@@ -356,8 +356,8 @@ class Video(models.Model):
     """
     site = models.ForeignKey('SamplingSite', blank=False, related_name='videos')
     year = models.IntegerField(blank=False)
-    url = models.URLField(blank=False, verify_exists=True)
-    full_thumbnail = models.URLField(null=True, verify_exists=True)
+    url = models.URLField(blank=False)
+    full_thumbnail = models.URLField(null=True)
     
     class Meta:
         ordering = ('-year', )
