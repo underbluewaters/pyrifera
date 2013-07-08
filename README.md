@@ -27,10 +27,14 @@ pip install -r requirements.txt
 
 Database Setup
 --------------
+**Create the initial database**
 ```
 echo "DROP DATABASE pyrifera;" | psql -h localhost
 echo "CREATE DATABASE pyrifera;" | psql -h localhost
 echo "create extension postgis;" | psql -h localhost pyrifera
+```
+**Tell pyrifera where to store media, and how to connnect to the db**
+```
 head -n 3 settings_local.py.template > settings_local.py
 mkdir ../deployed-media
 python -c 'import os; print "MEDIA_ROOT=\"" + os.path.abspath("../deployed-media") + "\""' >> settings_local.py 
@@ -47,7 +51,7 @@ echo 'DATABASES = {
 }' >> settings_local.py
 ```
 
-*Setup the applications database schema*
+**Setup the applications database schema**
 ```
 python manage.py syncdb
 ```
@@ -63,6 +67,7 @@ Final installation steps
 python manage.py site localhost:8000
 python manage.py install_media
 ```
+**Build the search index (drives species search) and clear out any cache**
 ```
 python manage.py rebuild_index
 ```
