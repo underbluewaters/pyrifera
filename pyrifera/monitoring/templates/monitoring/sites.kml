@@ -20,7 +20,7 @@
                     <tr>
                         <td align="right">
                             <img style="margin-bottom:-5px;" class="logo" src="{{MEDIA_URL}}kfm/logo_small.png"/>
-                            <a align="right" href="{% url monitoring.views.site site.pk %}" rel="sidebar">Site Information</a>
+                            <a align="right" href="{% url "monitoring.views.site" site.pk %}" rel="sidebar">Site Information</a>
                         </td>
                     </tr>
                 </table>

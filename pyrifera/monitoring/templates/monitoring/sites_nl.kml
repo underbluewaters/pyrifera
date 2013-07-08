@@ -23,7 +23,7 @@
         	<name>Survey Sites</name>
         	<Link>
         	    {% load absurl %}
-        		<href>{% absurl monitoring.views.sites project.pk %}</href>
+        		<href>{% absurl "monitoring.views.sites" project.pk %}</href>
         	</Link>
         </NetworkLink>
     </Document>

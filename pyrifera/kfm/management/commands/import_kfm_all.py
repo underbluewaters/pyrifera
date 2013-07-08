@@ -20,12 +20,12 @@ paths = (
     'KFM Site Information.txt',                 # 0
     'KFM Species Name.txt',                     # 1
     'videos.txt',                               # 2
-    'KFM Temperature 1993-2010.txt',            # 3
-    'KFM 1 m Quadrata Summary 1982-2010.txt',   # 4
-    'KFM 5 m Quadrata Summary 1996-2010.txt',   # 5
-    'KFM RPCs Summary 1982-2010.txt',           # 6
-    'KFM BandTransect Summary 1982-2010.txt',   # 7
-    'KFM Fish Transect 1 Normalized 1985-2010.txt', # 8
+    'KFM Temperature.txt',                      # 3
+    'KFM 1 m Quadrat Summary.txt',              # 4
+    'KFM 5 m Quadrat Summary.txt',              # 5
+    'KFM RPCs Summary.txt',                     # 6
+    'KFM BandTransect Summary.txt',             # 7
+    'KFM Fish Transect 1 Normalized.txt',       # 8
 )
 
 class Command(BaseCommand):

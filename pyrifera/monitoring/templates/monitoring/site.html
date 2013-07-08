@@ -486,8 +486,8 @@
     <div class="tabs">
         <ul>
             <li><a href="#SiteInfo"><span>Site Info</span></a></li>
-            <li><a href="{% url monitoring.views.species_lists site.pk %}"><span>Species Lists</span></a></li>
-            <li><a href="{% url monitoring.views.chart site.pk %}"><span>Create a Chart</span></a></li>
+            <li><a href="{% url "monitoring.views.species_lists" site.pk %}"><span>Species Lists</span></a></li>
+            <li><a href="{% url "monitoring.views.chart" site.pk %}"><span>Create a Chart</span></a></li>
         </ul>
         <div id="SiteInfo">
             <h3>Sampled {{site.earliest}} - {{site.latest}}</h3>

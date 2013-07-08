@@ -7,7 +7,7 @@
     <div class="tabs">
         <ul>
             {% for protocol in site.protocols.all %}
-                <li><a href="{% url monitoring.views.protocol_species_list protocol.pk site.pk %}">{{protocol.name}}</a></li>
+                <li><a href="{% url "monitoring.views.protocol_species_list" protocol.pk site.pk %}">{{protocol.name}}</a></li>
             {% endfor %}
         </ul>
     </div>

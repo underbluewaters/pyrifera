@@ -415,7 +415,7 @@ DEFAULT_RANGE = 1000;
 
 def calclookat(geom, timestamp):
     geom = geom.clone()
-    geom.transform(4326)
+    # geom.transform(4326)
     center = geom.centroid;
     extent = geom.extent
     w = extent[0]

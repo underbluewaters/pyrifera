@@ -461,7 +461,7 @@
             });        
 
             $('#addTaxa').click(function(){
-                var href = "{% url monitoring.views.search 1 %}";
+                var href = "{% url "monitoring.views.search" 1 %}";
                 search_panel.showUrl(href, {});
             });            
         }else{
