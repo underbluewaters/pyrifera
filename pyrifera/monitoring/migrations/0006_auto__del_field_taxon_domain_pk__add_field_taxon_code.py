@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.delete_column('monitoring_taxon', 'domain_pk')
 
         # Adding field 'Taxon.code'
-        db.add_column('monitoring_taxon', 'code', self.gf('django.db.models.fields.CharField')(default=datetime.date(2010, 7, 14), max_length=100, blank=True), keep_default=False)
+        db.add_column('monitoring_taxon', 'code', self.gf('django.db.models.fields.CharField')(default=datetime.date(2010, 7, 14), max_length=100, blank=False, unique=True), keep_default=False)
     
     
     def backwards(self, orm):
@@ -48,7 +48,7 @@ class Migration(SchemaMigration):
         },
         'monitoring.taxon': {
             'Meta': {'object_name': 'Taxon'},
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'False', 'unique': 'True'}),
             'common_name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'genus': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),

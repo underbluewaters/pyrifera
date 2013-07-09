@@ -14,6 +14,9 @@ from kfm.management.commands.import_kfm_band import Command as ImportBand
 from kfm.management.commands.import_kfm_fish_transects import Command as ImportFishTransect
 from kfm.management.commands.kfm_remove_taxa import Command as RemoveTaxa
 from haystack.management.commands.rebuild_index import Command as RebuildIndex
+from django.core.cache import cache
+from distutils.util import strtobool
+
 from monitoring.models import *
 
 paths = (
@@ -30,30 +33,60 @@ paths = (
 
 class Command(BaseCommand):
     option_list = AppCommand.option_list
-    help = "Imports all data from a base path. Assumes certain file names."
+    help = """
+    Imports all data from a base path. Assumes certain file names.
+    example usage:
+        python manage.py import_kfm_all ./path-to-data-dir http://kfm-videos.underbluewaters.net
+    """
     args = '[path prefix]'
     
     def handle(self, path, prefix, *args, **options):
-        print "Importing sites"
-        ImportSites().execute(join(path, paths[0]))
-        print "Importing Taxa"
-        ImportTaxa().execute(join(path, paths[1]))
-        print "Importing Videos"
-        ImportVideos().execute(prefix, join(path, paths[2]))
-        print "Importing Quad 1m"
-        ImportQuad1m().execute(join(path, paths[4]))
-        print "Importing Quad 5m"
-        ImportQuad5m().execute(join(path, paths[5]))
-        print "Importing RPC"
-        ImportRpc().execute(join(path, paths[6]))
-        print "Importing Band Transect"
-        ImportBand().execute(join(path, paths[7]))
-        print "Importing Fish Transect"
-        ImportFishTransect().execute(join(path, paths[8]))
-        print "Importing Temperature Data"
-        ImportTemp().execute(join(path, paths[3]))
-        RemoveTaxa().execute()
-        print "Must now rebuild search index"
-        RebuildIndex().execute()
-        print "Done"
         
+
+        print "Importing new data will destroy the current database. Proceed? [y/N]"
+        try:
+            confirm = strtobool(raw_input()) is 1
+        except:
+            confirm = False
+        if confirm:
+
+            print "Deleting old data"
+            MeanDensity.objects.all().delete()
+            Protocol.objects.all().delete()
+            Taxon.objects.all().delete()
+            SamplingSite.objects.all().delete()
+            WaterTemperature.objects.all().delete()
+            Video.objects.all().delete()
+
+            print "Importing sites"
+            ImportSites().execute(join(path, paths[0]))
+            print "Importing Taxa"
+            ImportTaxa().execute(join(path, paths[1]))
+            print "Importing Videos"
+            ImportVideos().execute(prefix, join(path, paths[2]))
+
+            print """
+Now for the slow part.
+Importing Quad (1 & 5m), RPC, Band Tansect, Fish, and Temperature Data
+            """
+            print "Importing Quad 1m"
+            ImportQuad1m().execute(join(path, paths[4]))
+            print "Importing Quad 5m"
+            ImportQuad5m().execute(join(path, paths[5]))
+            print "Importing RPC"
+            ImportRpc().execute(join(path, paths[6]))
+            print "Importing Band Transect"
+            ImportBand().execute(join(path, paths[7]))
+            print "Importing Fish Transect"
+            ImportFishTransect().execute(join(path, paths[8]))
+            print "Importing Temperature Data"
+            ImportTemp().execute(join(path, paths[3]))
+            RemoveTaxa().execute()
+            print "Must now rebuild search index"
+            RebuildIndex().execute()
+            print "Clearing caches"
+            cache.clear()
+            print "Done"
+        else:
+            print "cancelled"
+            return

@@ -201,7 +201,7 @@ class Taxon(models.Model):
     genus = models.CharField(db_index=True, max_length=200, blank=True)
     species = models.CharField(max_length=200, blank=True)
     scientific_name = models.CharField(max_length=200, blank=True)
-    code = models.CharField(max_length=100, blank=True)
+    code = models.CharField(max_length=100, unique=True)
     # for when you need to mention "This species was added to our lists
     # in 2003 because we decided to split Kelp Bass into Kelp Bass recruits 
     # and adults"

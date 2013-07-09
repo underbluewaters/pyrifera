@@ -6,6 +6,7 @@ from django.db import transaction
 from datetime import datetime
 from decimal import *
 from fish import ProgressFish
+from monitoring.data_import import highlightError
 
 sites = dict()
 
@@ -26,21 +27,26 @@ class Command(BaseCommand):
         kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
         WaterTemperature.objects.filter(site__project=kfm).delete()
         fish = ProgressFish(total=file_len(path) - 1)
-        reader = csv.DictReader(open(path))
+        f = open(path)
+        reader = csv.DictReader(f)
         count = 0
         for row in reader:
-            fish.animate(amount=reader.line_num - 1)
-            count += 1
-            sitecode = str(row['SiteCode'])
-            datet = datetime.strptime(row['Date'], "%m/%d/%Y %H:%M:%S")
-            celsius = Decimal(row['AvgOfTemperatureC'])
-            site = getSite(sitecode, kfm)
-            if site:
-                temp = WaterTemperature(
-                    site=site, 
-                    date=datet,
-                    celsius=celsius)
-                temp.save()
+            try:
+                fish.animate(amount=reader.line_num - 1)
+                count += 1
+                sitecode = str(row['SiteCode'])
+                datet = datetime.strptime(row['Date'], "%m/%d/%Y %H:%M:%S")
+                celsius = Decimal(row['AvgOfTemperatureC'])
+                site = getSite(sitecode, kfm)
+                if site:
+                    temp = WaterTemperature(
+                        site=site, 
+                        date=datet,
+                        celsius=celsius)
+                    temp.save()
+            except:
+                highlightError(reader, f, row)
+                raise
             
         print "done. added %s temperature records" % (count, )
 

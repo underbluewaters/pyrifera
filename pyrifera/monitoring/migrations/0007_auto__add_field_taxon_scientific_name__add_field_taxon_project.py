@@ -48,7 +48,7 @@ class Migration(SchemaMigration):
         },
         'monitoring.taxon': {
             'Meta': {'object_name': 'Taxon'},
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'False', 'unique': 'True'}),
             'common_name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'genus': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),

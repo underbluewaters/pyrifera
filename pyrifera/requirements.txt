@@ -5,3 +5,4 @@ fish
 pygooglechart
 -e git+https://github.com/underbluewaters/marinemap.git#egg=marinemap
 PIL
+termcolor

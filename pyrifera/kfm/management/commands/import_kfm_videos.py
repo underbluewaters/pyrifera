@@ -6,6 +6,7 @@ from django.contrib.gis.geos import Point, fromstr
 from django.db import transaction
 import re
 from urlparse import urljoin
+from monitoring.data_import import printLines, highlightError
 
 class Command(BaseCommand):
     option_list = AppCommand.option_list
@@ -27,12 +28,23 @@ class Command(BaseCommand):
         """
         count = 0
         r = re.compile("(\w+) (\d+).mp4")
-        for line in open(path):
+        f = open(path)
+        i = 0
+        for line in f:
+            i += 1
             match = r.match(line)
             if match:
                 site, year = match.groups()
                 site = site[2:]
-                site = SamplingSite.objects.get(code=site)
+                try:
+                    site = SamplingSite.objects.get(code=site)
+                except SamplingSite.DoesNotExist:
+                    printLines(f, i - 5, i + 5, i)
+                    raise
+                except:
+                    printLines(f, i - 5, i + 5, i)
+                    raise
+
                 url = urljoin(prefix, line)
                 video = Video(site=site, year=int(year), url=url, 
                     full_thumbnail=url.strip()+'.jpg')

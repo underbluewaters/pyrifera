@@ -60,3 +60,5 @@ CACHES = {
 from settings_local import *
 
 APP_NAME = 'NPS Kelp Forest Monitoring Data Viewer'
+
+LOG_FILE="./server.log"
