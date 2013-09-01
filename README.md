@@ -35,7 +35,7 @@ echo "create extension postgis;" | psql -h localhost pyrifera
 ```
 **Tell pyrifera where to store media, and how to connnect to the db**
 ```
-head -n 4 settings_local.py.template > settings_local.py
+head -n 3 settings_local.py.template > settings_local.py
 mkdir ../deployed-media
 python -c 'import os; print "MEDIA_ROOT=\"" + os.path.abspath("../deployed-media") + "\""' >> settings_local.py 
 echo 'MEDIA_URL = "http://localhost:8000/media/"\n' >> settings_local.py
@@ -50,8 +50,6 @@ echo 'DATABASES = {
     }
 }' >> settings_local.py
 ```
-
-Then set `GOOGLE_ANALYTICS_KEY` to something appropriate for the domain.
 
 **Setup the applications database schema**
 ```
