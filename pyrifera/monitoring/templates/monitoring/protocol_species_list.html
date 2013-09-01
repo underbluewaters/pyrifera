@@ -97,6 +97,7 @@
     </style>
     <script type="text/javascript" charset="utf-8">
         lingcod.onShow((function(){
+          _gaq.push(['_trackEvent', 'Survey Sites', 'view {{protocol.name|safe}} list', "{{site.name|safe}}", 5, true]);
           return function(){
             var data = {{means|safe}};
             var keys = [];

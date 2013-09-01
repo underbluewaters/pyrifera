@@ -200,7 +200,8 @@ var options = {
                 searchChoiceCallback(a);
             }else{
                 var href = a.attr('href');
-                loadPData(href, a.attr('title'));                
+                loadPData(href, a.attr('title'));
+                _gaq.push(['_trackEvent', 'Species Map', 'show map', a.attr('title'), 5, true]);
             }
         }
         
