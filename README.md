@@ -51,6 +51,8 @@ echo 'DATABASES = {
 }' >> settings_local.py
 ```
 
+Then set `GOOGLE_ANALYTICS_KEY` to something appropriate for the domain.
+
 **Setup the applications database schema**
 ```
 python manage.py syncdb
