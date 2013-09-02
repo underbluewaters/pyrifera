@@ -2,7 +2,7 @@ Django==1.5
 whoosh==1.8.4
 django-haystack==1.2.7
 fish
-pygooglechart
+-e git+https://github.com/gak/pygooglechart.git#egg=pygooglechart
 -e git+https://github.com/underbluewaters/marinemap.git#egg=marinemap
 PIL
 termcolor
