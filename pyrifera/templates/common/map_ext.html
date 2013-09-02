@@ -45,6 +45,8 @@ var options = {
         var qValue = '';
         var cOffset = 0;
         
+	window.onLocalImageLoad = function(el){$(el).parent().addClass('hide-gs');}
+
         function onTaxonSubmit(offset, force){
             if(!offset){
                 offset = 0;
@@ -384,6 +386,23 @@ var options = {
           display:none;
         }
         
+        .image_results > img {
+          position:absolute;
+          left:-10000px;
+        }
+
+        .image_results.hide-gs > img {
+          position:relative;
+          left:0px;
+        }
+
+        .image_results.hide-gs .gs-result {
+          display:none;
+        }
+
+        .image_results.hide-gs .gs-watermark {
+          display:none;
+        }
     </style>
 
 {% endblock headtwo %}
@@ -516,3 +535,4 @@ var options = {
 {% block metanavigation %}
 <li><a href="#" id="about">about this site</a></li>    
 {% endblock metanavigation %}
+

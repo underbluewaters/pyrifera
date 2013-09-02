@@ -1,6 +1,8 @@
 {% load absurl %}
 <li class="taxon_result" id="taxon_{{object.pk}}">
-    <div class="image_results" data-search-term="{{object.image_search_term}}"></div>
+    <div class="image_results" data-search-term="{{object.image_search_term}}">
+        <img onload="onLocalImageLoad(this);" width="117" height="100" src="/Species Images/thumbnails/{{object.code}}.jpg">
+    </div>
     <h3>{{object.name}}<span class="common_name">{{object.common_name}}</span></h3>
     {% ifequal object.protocols.count 1 %}
     <p>This species is sampled by the {% for protocol in object.protocols %}<a class="protocol" href="#">{{protocol.name|lower}}</a>{% endfor %} protocol.</p>

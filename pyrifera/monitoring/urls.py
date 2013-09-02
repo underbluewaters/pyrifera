@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     (r'^chart/(\d+)/', 'monitoring.views.chart'),
     (r'^records/(\d+)/(\d+)/(\d+)/', 'monitoring.views.taxon_records'),
     (r'^taxon_overlay/(\d+)/', 'monitoring.views.taxon_overlay'),
+    (r'^Species Images/thumbnails/(.+)', 'monitoring.views.taxon_thumbnail')
 )

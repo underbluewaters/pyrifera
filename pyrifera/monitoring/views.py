@@ -7,9 +7,10 @@ from symbolizers import ScaledImageGChartSymbolizer
 from settings import MEDIA_URL, MEDIA_ROOT
 import operator
 from haystack.query import SearchQuerySet, SQ
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 import Image, ImageFont, ImageDraw
 from django.views.decorators.cache import cache_page
+import string
 
 @cache_page(60 * 60 * 24 * 30)
 def projects(request):
@@ -217,3 +218,38 @@ def taxon_overlay(request, pk):
     response = HttpResponse(mimetype="image/png")
     im.save(response, "PNG")
     return response
+
+def taxon_thumbnail(request, code):
+    max_width = 117
+    max_height = 100
+    code = string.replace(code, ".jpg", "")
+    if os.path.exists(MEDIA_ROOT + "/Species Images/" + code + ".jpg"):
+        img = Image.open(MEDIA_ROOT + "/Species Images/" + code + ".jpg")
+        
+        src_width, src_height = img.size
+        src_ratio = float(src_width) / float(src_height)
+        dst_width, dst_height = max_width, max_height
+        dst_ratio = float(dst_width) / float(dst_height)
+
+        if dst_ratio < src_ratio:
+            crop_height = src_height
+            crop_width = crop_height * dst_ratio
+            x_offset = float(src_width - crop_width) / 2
+            y_offset = 0
+        else:
+            crop_width = src_width
+            crop_height = crop_width / dst_ratio
+            x_offset = 0
+            y_offset = float(src_height - crop_height) / 3
+	crop_width = int(crop_width)
+	x_offset = int(x_offset)
+	
+        img = img.crop((x_offset, y_offset, x_offset+int(crop_width), y_offset+int(crop_height)))
+        img = img.resize((dst_width, dst_height), Image.ANTIALIAS)
+        img.save(MEDIA_ROOT + "/Species Images/thumbnails/" + code + ".jpg")
+        response = HttpResponse(mimetype="image/jpg")
+        img.save(response, "JPEG")
+        return response
+    else:
+        return HttpResponseNotFound("thumbnail does not exist. " + MEDIA_ROOT + "/Species Images/" + code + ".jpg")
+
