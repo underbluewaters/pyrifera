@@ -67,13 +67,8 @@ Final installation steps
 python manage.py site localhost:8000
 python manage.py install_media
 ```
-**Build the search index (drives species search) and clear out any cache**
-```
-python manage.py rebuild_index
-```
-```
-python manage.py clear_cache
-```
+
+Feed data into the database following the steps in the [data update guide](https://github.com/underbluewaters/pyrifera/wiki/Updating-Data).
 
 Run the application development Server
 --------------------------------------
