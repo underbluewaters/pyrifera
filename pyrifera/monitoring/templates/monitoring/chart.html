@@ -138,7 +138,9 @@
         colorScale: d3.scale.category10(),
         
         addTaxon: function(data){
-            _gaq.push(['_trackEvent', 'Chart Species', (data.scientific_name || data.common_name), "{{site.name|safe}}", 5, true]);
+            if (window._gaq) {
+                _gaq.push(['_trackEvent', 'Chart Species', (data.scientific_name || data.common_name), "{{site.name|safe}}", 5, true]);
+            }
             if(this.taxa.length >= this.limit){
                 alert('You cannot add more than ' + 
                     this.limit + ' taxa to the chart.');
