@@ -5,7 +5,7 @@ import csv
 from django.db import transaction
 from datetime import datetime
 from decimal import *
-from fish import ProgressFish
+from progressbar import ProgressBar
 from monitoring.data_import import highlightError
 
 sites = dict()
@@ -26,13 +26,13 @@ class Command(BaseCommand):
         """
         kfm = Project.objects.get(name="NPS Kelp Forest Monitoring")
         WaterTemperature.objects.filter(site__project=kfm).delete()
-        fish = ProgressFish(total=file_len(path) - 1)
         f = open(path)
         reader = csv.DictReader(f)
         count = 0
+        progress = ProgressBar(maxval=file_len(path) - 1).start()
         for row in reader:
             try:
-                fish.animate(amount=reader.line_num - 1)
+                progress.update(reader.line_num - 1)
                 count += 1
                 sitecode = str(row['SiteCode'])
                 datet = datetime.strptime(row['Date'], "%m/%d/%Y %H:%M:%S")
@@ -47,7 +47,8 @@ class Command(BaseCommand):
             except:
                 highlightError(reader, f, row)
                 raise
-            
+        
+        progress.finish()    
         print "done. added %s temperature records" % (count, )
 
 

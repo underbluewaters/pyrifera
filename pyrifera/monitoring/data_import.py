@@ -1,6 +1,6 @@
 import csv
 
-from fish import ProgressFish
+from progressbar import ProgressBar
 from django.db import transaction
 from django.db.models import Q
 from termcolor import colored
@@ -68,11 +68,11 @@ def import_data(path, project, protocol_name, unit_name, unit_suffix, **kwargs):
             protocol.save()
             print "Protocol %s created." % (protocol_name, )
 
-        fish = ProgressFish(total=file_len(path) - 1)
         f = open(path, 'r')
         reader = csv.DictReader(f)
+        progress = ProgressBar(maxval=file_len(path) - 1).start()
         for row in reader:
-            fish.animate(amount=reader.line_num - 1)
+            progress.update(reader.line_num - 1)
             code = None
             try:
                 taxon = Taxon.objects.get(
@@ -125,6 +125,7 @@ def import_data(path, project, protocol_name, unit_name, unit_suffix, **kwargs):
                 highlightError(reader, f, row)
                 raise
 
+        progress.finish()
         return reader.line_num - 1
 
 def file_len(fname):
